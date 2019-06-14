@@ -57,13 +57,6 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -110,7 +103,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Spring boot starte web -->
+		<!-- Spring boot starter web -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
