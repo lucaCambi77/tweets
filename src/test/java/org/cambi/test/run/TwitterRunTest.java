@@ -1,6 +1,7 @@
 package org.cambi.test.run;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
@@ -26,13 +27,13 @@ import org.cambi.repository.UserRepository;
 import org.cambi.service.ITwitterService;
 import org.cambi.test.config.StatusRun;
 import org.cambi.utils.Utils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
@@ -44,9 +45,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,11 +59,10 @@ import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpRequest;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { Application.class, AppConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext
 @TestPropertySource(locations = "/test.properties")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(OrderAnnotation.class)
 public class TwitterRunTest extends Constant {
 
 	private static final Logger log = LoggerFactory.getLogger(TwitterRunTest.class);
@@ -94,60 +93,66 @@ public class TwitterRunTest extends Constant {
 
 	private static Run run;
 
+	private boolean init = false;
+
 	/**
 	 * Mock of a list of tweets from file. Mock of {@link TwitterAuthenticator}}
 	 * 
 	 * @throws Exception
 	 */
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		if (!init) {
+			MockitoAnnotations.initMocks(this);
 
-		/**
-		 * We read tweets from a file to create a fake request
-		 * 
-		 * Mocking google Transport
-		 */
-		HttpTransport transport = new MockHttpTransport() {
-			@Override
-			public LowLevelHttpRequest buildRequest(String method, String url) throws IOException {
-				return new MockLowLevelHttpRequest() {
-					@Override
-					public LowLevelHttpResponse execute() throws IOException {
+			/**
+			 * We read tweets from a file to create a fake request
+			 * 
+			 * Mocking google Transport
+			 */
+			HttpTransport transport = new MockHttpTransport() {
+				@Override
+				public LowLevelHttpRequest buildRequest(String method, String url) throws IOException {
+					return new MockLowLevelHttpRequest() {
+						@Override
+						public LowLevelHttpResponse execute() throws IOException {
 
-						InputStream is = new FileInputStream("src/test/resources/tweets.json");
-						BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+							InputStream is = new FileInputStream("src/test/resources/tweets.json");
+							BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 
-						String line = buf.readLine();
-						StringBuilder sb = new StringBuilder();
+							String line = buf.readLine();
+							StringBuilder sb = new StringBuilder();
 
-						while (line != null) {
-							sb.append(line).append("\n");
-							line = buf.readLine();
+							while (line != null) {
+								sb.append(line).append("\n");
+								line = buf.readLine();
+							}
+							buf.close();
+
+							StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
+							sb = new StringBuilder();
+
+							for (TweetRun tweet : status.getTweets()) {
+								sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
+							}
+
+							MockLowLevelHttpResponse response = new MockLowLevelHttpResponse();
+							response.setStatusCode(200);
+							response.setContentType(Json.MEDIA_TYPE);
+							response.setContent(sb.toString());
+							return response;
 						}
-						buf.close();
+					};
+				}
+			};
 
-						StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
-						sb = new StringBuilder();
-
-						for (TweetRun tweet : status.getTweets()) {
-							sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
-						}
-
-						MockLowLevelHttpResponse response = new MockLowLevelHttpResponse();
-						response.setStatusCode(200);
-						response.setContentType(Json.MEDIA_TYPE);
-						response.setContent(sb.toString());
-						return response;
-					}
-				};
-			}
-		};
-
-		when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
+			when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
+			init = true;
+		}
 	}
 
 	@Test
+	@Order(1)
 	public void mockHttpRequest()
 			throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
@@ -156,7 +161,7 @@ public class TwitterRunTest extends Constant {
 		Run response = twitterService.parseTweetsFromRequest(authenticator.getAuthorizedHttpRequestFactory(),
 				DEFAULT_API.concat("?track=bieber"));
 
-		Assert.assertTrue(response.getTweetRuns().size() == 5);
+		assertTrue(response.getTweetRuns().size() == 5);
 		// Assert.assertTrue(response.getTweetsByUser().size() == 2);
 
 		log.info(" **** ***   **   *** **** **** **** ");
@@ -177,7 +182,7 @@ public class TwitterRunTest extends Constant {
 		 * We have a new Run
 		 */
 		List<Run> runs = runRepository.findAll();
-		Assert.assertTrue(runs.size() == 1);
+		assertTrue(runs.size() == 1);
 
 		log.info("We have new Tweets");
 
@@ -185,17 +190,18 @@ public class TwitterRunTest extends Constant {
 		 * We have 5 tweets
 		 */
 		List<TweetRun> tweets = twitterRepository.findAll();
-		Assert.assertTrue(tweets.size() == 5);
+		assertTrue(tweets.size() == 5);
 
 		/**
 		 * We have only 3 users plus 2 empty
 		 */
 		List<UserTweet> users = userRepository.findAll();
-		Assert.assertTrue(users.size() == 3);
+		assertTrue(users.size() == 3);
 
 	}
 
 	@Test
+	@Order(2)
 	public void testGreeting() throws Exception {
 		ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/", String.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
@@ -207,7 +213,7 @@ public class TwitterRunTest extends Constant {
 	 * @throws Exception
 	 */
 	@Test
-	@Ignore
+	@Disabled
 	public void testRun() throws Exception {
 		ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
 				String.class);
@@ -217,6 +223,7 @@ public class TwitterRunTest extends Constant {
 	}
 
 	@Test
+	@Order(3)
 	public void testRunList() throws Exception {
 		ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
 				String.class);
