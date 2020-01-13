@@ -36,7 +36,7 @@ public class TwitterServiceRunnable implements Runnable {
 
 	private Set<TweetRun> tweets;
 
-	private String exception = "";
+	private String exception;
 
 	/**
 	 * 

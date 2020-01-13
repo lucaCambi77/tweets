@@ -40,7 +40,7 @@ public class Run implements java.io.Serializable {
 	@Id
 	@SequenceGenerator(name = "rungenerator", sequenceName = "TWEET.RUN_SEQUENCE", allocationSize = 1)
 	@GeneratedValue(strategy = SEQUENCE, generator = "rungenerator")
-	@Column(name = "C_RUN_ID", nullable = true, precision = 10, scale = 0)
+	@Column(nullable = true, precision = 10, scale = 0)
 	public Long getRunId() {
 		return runId;
 	}
@@ -49,7 +49,7 @@ public class Run implements java.io.Serializable {
 		this.runId = runId;
 	}
 
-	@Column(name = "D_INI", nullable = true, length = 7)
+	@Column(nullable = true, length = 7)
 	public Date getIns() {
 		return ins;
 	}
@@ -58,7 +58,7 @@ public class Run implements java.io.Serializable {
 		this.ins = ins;
 	}
 
-	@Column(name = "N_RUN_TIM", nullable = false)
+	@Column(nullable = false)
 	public long getRunTime() {
 		return runTime;
 	}
@@ -67,7 +67,7 @@ public class Run implements java.io.Serializable {
 		this.runTime = runTime;
 	}
 
-	@Column(name = "N_TWE", nullable = false)
+	@Column(nullable = false)
 	public int getNumTweet() {
 		return numTweet;
 	}
@@ -76,7 +76,7 @@ public class Run implements java.io.Serializable {
 		this.numTweet = numTweet;
 	}
 
-	@Column(name = "T_API", nullable = false)
+	@Column(nullable = false)
 	public String getApi() {
 		return api;
 	}
@@ -85,7 +85,7 @@ public class Run implements java.io.Serializable {
 		this.api = api;
 	}
 
-	@Column(name = "T_API_QUE", nullable = false)
+	@Column(nullable = false)
 	public String getApiQuery() {
 		return apiQuery;
 	}
@@ -103,7 +103,7 @@ public class Run implements java.io.Serializable {
 		this.tweetRuns = tweetRuns;
 	}
 
-	@Column(name = "T_EXC", nullable = false)
+	@Column
 	public String getException() {
 		return exception;
 	}

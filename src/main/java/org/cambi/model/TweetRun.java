@@ -40,7 +40,7 @@ public class TweetRun implements java.io.Serializable {
 
 	@Id
 	@GeneratedValue(strategy = SEQUENCE, generator = "messagegenerator")
-	@Column(name = "C_MES_ID", nullable = false, precision = 50, scale = 0)
+	@Column(nullable = false, precision = 50, scale = 0)
 	public BigInteger getId() {
 		return id;
 	}
@@ -50,7 +50,7 @@ public class TweetRun implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "C_RUN_ID", nullable = false, insertable = true, updatable = false)
+	@JoinColumn(nullable = false, insertable = true, updatable = false)
 	public Run getRun() {
 		return run;
 	}
@@ -63,7 +63,7 @@ public class TweetRun implements java.io.Serializable {
 		this.creationDate = creationDate;
 	}
 
-	@Column(name = "D_MES_CRE", nullable = false, length = 7)
+	@Column(nullable = false, length = 7)
 	public Date getCreationDate() {
 		return creationDate;
 	}
@@ -72,7 +72,7 @@ public class TweetRun implements java.io.Serializable {
 		this.messageText = messageText;
 	}
 
-	@Column(name = "T_TEX_MES", nullable = true)
+	@Column(nullable = true, length = 4200)
 	public String getMessageText() {
 		return messageText;
 	}

@@ -7,6 +7,8 @@ import org.cambi.constant.Constant;
 import org.cambi.dto.ObjectMapperFactory;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
+import org.cambi.repository.UserRepository;
+import org.cambi.service.TwitterService;
 import org.cambi.service.TwitterServiceRunnable;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -24,10 +26,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 @Configuration
-@EnableJpaRepositories(basePackages = "org.cambi.repository")
+@EnableJpaRepositories(basePackageClasses = UserRepository.class)
 @EnableTransactionManagement
 @EntityScan(basePackageClasses = UserTweet.class)
-@ComponentScan(basePackages = { "org.cambi.service" })
+@ComponentScan(basePackageClasses = TwitterService.class)
 public class AppConfiguration extends Constant {
 
 	@Bean

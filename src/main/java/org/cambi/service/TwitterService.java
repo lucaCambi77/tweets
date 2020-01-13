@@ -92,7 +92,7 @@ public class TwitterService extends Constant implements ITwitterService {
 		runRepository.save(newRun);
 
 		/**
-		 * Tweetts
+		 * Tweets
 		 */
 		tweetDto.forEach(aTweet -> {
 			TweetRun tweetRun = new TweetRun();

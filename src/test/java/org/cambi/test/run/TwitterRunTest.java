@@ -45,12 +45,20 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
 import com.google.api.client.http.LowLevelHttpResponse;
@@ -63,6 +71,9 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 @SpringBootTest(classes = { Application.class, AppConfiguration.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/test.properties")
 @TestMethodOrder(OrderAnnotation.class)
+@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
+		TransactionalTestExecutionListener.class, DbUnitTestExecutionListener.class })
+@Transactional
 public class TwitterRunTest extends Constant {
 
 	private static final Logger log = LoggerFactory.getLogger(TwitterRunTest.class);
@@ -162,7 +173,6 @@ public class TwitterRunTest extends Constant {
 				DEFAULT_API.concat("?track=bieber"));
 
 		assertTrue(response.getTweetRuns().size() == 5);
-		// Assert.assertTrue(response.getTweetsByUser().size() == 2);
 
 		log.info(" **** ***   **   *** **** **** **** ");
 		log.info("  **   *** **** ***  **   **    **  ");
@@ -224,6 +234,8 @@ public class TwitterRunTest extends Constant {
 
 	@Test
 	@Order(3)
+	@DatabaseTearDown
+	@Sql("sampledata.sql")
 	public void testRunList() throws Exception {
 		ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
 				String.class);
