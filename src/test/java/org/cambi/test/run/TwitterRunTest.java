@@ -93,7 +93,7 @@ public class TwitterRunTest extends Constant {
 
 	private static Run run;
 
-	private boolean init = false;
+	private boolean isInit = false;
 
 	/**
 	 * Mock of a list of tweets from file. Mock of {@link TwitterAuthenticator}}
@@ -102,7 +102,7 @@ public class TwitterRunTest extends Constant {
 	 */
 	@BeforeEach
 	public void setUp() throws Exception {
-		if (!init) {
+		if (!isInit) {
 			MockitoAnnotations.initMocks(this);
 
 			/**
@@ -147,7 +147,7 @@ public class TwitterRunTest extends Constant {
 			};
 
 			when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
-			init = true;
+			isInit = true;
 		}
 	}
 

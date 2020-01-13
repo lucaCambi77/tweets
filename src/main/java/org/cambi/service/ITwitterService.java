@@ -6,7 +6,6 @@ package org.cambi.service;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import org.cambi.dto.RunDto;
 import org.cambi.model.Run;
 
 import com.google.api.client.http.HttpRequestFactory;

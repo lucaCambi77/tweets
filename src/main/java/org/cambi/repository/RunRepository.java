@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @author luca
  *
  */
-@Component
+@Component	
 public interface RunRepository extends JpaRepository<Run, Long> {
 	
 	
