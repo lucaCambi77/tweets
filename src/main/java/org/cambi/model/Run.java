@@ -103,7 +103,7 @@ public class Run implements java.io.Serializable {
 		this.tweetRuns = tweetRuns;
 	}
 
-	@Column(nullable = false)
+	@Column
 	public String getException() {
 		return exception;
 	}
