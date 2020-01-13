@@ -162,7 +162,6 @@ public class TwitterRunTest extends Constant {
 				DEFAULT_API.concat("?track=bieber"));
 
 		assertTrue(response.getTweetRuns().size() == 5);
-		// Assert.assertTrue(response.getTweetsByUser().size() == 2);
 
 		log.info(" **** ***   **   *** **** **** **** ");
 		log.info("  **   *** **** ***  **   **    **  ");

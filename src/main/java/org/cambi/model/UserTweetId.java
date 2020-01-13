@@ -22,7 +22,7 @@ public class UserTweetId implements java.io.Serializable {
 		this.messageId = messageId;
 	}
 
-	@Column(name = "C_USE_ID", nullable = false, precision = 50, scale = 0)
+	@Column(nullable = false, precision = 50, scale = 0)
 	public BigInteger getUserId() {
 		return userId;
 	}
@@ -31,7 +31,7 @@ public class UserTweetId implements java.io.Serializable {
 		this.userId = runId;
 	}
 
-	@Column(name = "C_MES_ID", nullable = false, precision = 50, scale = 0)
+	@Column(nullable = false, precision = 50, scale = 0)
 	public BigInteger getMessageId() {
 		return messageId;
 	}

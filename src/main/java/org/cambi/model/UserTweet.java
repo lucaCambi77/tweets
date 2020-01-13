@@ -36,8 +36,8 @@ public class UserTweet implements java.io.Serializable {
 
 	@EmbeddedId
 	@AttributeOverrides({
-			@AttributeOverride(name = "userId", column = @Column(name = "C_USE_ID", nullable = false, precision = 50, scale = 0)),
-			@AttributeOverride(name = "messageId", column = @Column(name = "C_MES_ID", nullable = false, precision = 50, scale = 0)) })
+			@AttributeOverride(name = "userId", column = @Column(name = "userId", nullable = false, precision = 50, scale = 0)),
+			@AttributeOverride(name = "messageId", column = @Column(name = "messageId", nullable = false, precision = 50, scale = 0)) })
 	public UserTweetId getId() {
 		return id;
 	}
@@ -46,7 +46,7 @@ public class UserTweet implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@Column(name = "T_USE_NAM", nullable = false)
+	@Column(nullable = false)
 	public String getUserName() {
 		return userName;
 	}
@@ -55,7 +55,7 @@ public class UserTweet implements java.io.Serializable {
 		this.userName = userName;
 	}
 
-	@Column(name = "T_USE_SCR", nullable = false)
+	@Column(nullable = false)
 	public String getUserSreenName() {
 		return userSreenName;
 	}
@@ -64,7 +64,7 @@ public class UserTweet implements java.io.Serializable {
 		this.userSreenName = userSreenName;
 	}
 
-	@Column(name = "D_USE_CRE", nullable = false, length = 7)
+	@Column(nullable = false, length = 7)
 	public Date getCreationDate() {
 		return creationDate;
 	}
@@ -74,7 +74,7 @@ public class UserTweet implements java.io.Serializable {
 	}
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "C_MES_ID", insertable = false, updatable = false)
+	@JoinColumn(name = "messageId", insertable = false, updatable = false)
 	public TweetRun getTweetRuns() {
 		return tweetRuns;
 	}
