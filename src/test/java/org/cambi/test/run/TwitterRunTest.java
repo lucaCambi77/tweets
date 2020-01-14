@@ -55,6 +55,7 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 	TransactionDbUnitTestExecutionListener.class})
 @ActiveProfiles("test")
 @DbUnitConfiguration(databaseConnection = {"dataSource"})
+// TODO Dbunit schema handling, @DatabaseTearDown not working
 public class TwitterRunTest extends Constant
 {
 
