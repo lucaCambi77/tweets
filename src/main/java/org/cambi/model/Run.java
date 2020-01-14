@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-@Table(name = "RUN", schema = "TWEET")
+//@Table(name = "RUN", schema = "TWEET")
 public class Run implements java.io.Serializable {
 
 	private Long runId;
@@ -38,7 +38,7 @@ public class Run implements java.io.Serializable {
 	}
 
 	@Id
-	@SequenceGenerator(name = "rungenerator", sequenceName = "TWEET.RUN_SEQUENCE", allocationSize = 1)
+	@SequenceGenerator(name = "rungenerator", sequenceName = "RUN_SEQUENCE", allocationSize = 1)
 	@GeneratedValue(strategy = SEQUENCE, generator = "rungenerator")
 	@Column(nullable = true, precision = 10, scale = 0)
 	public Long getRunId() {

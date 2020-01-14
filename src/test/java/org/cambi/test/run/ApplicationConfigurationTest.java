@@ -53,8 +53,8 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 @Configuration
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 @EnableTransactionManagement
-@Profile("test")
 @ComponentScan(basePackageClasses = TwitterService.class)
+@Profile("test")
 public class ApplicationConfigurationTest
 {
 	@Mock
@@ -120,7 +120,7 @@ public class ApplicationConfigurationTest
 	public DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.h2.Driver");
-		dataSource.setUrl("jdbc:h2:mem:db;INIT=CREATE SCHEMA IF NOT EXISTS TWEET;DB_CLOSE_DELAY=-1");
+		dataSource.setUrl("jdbc:h2:mem:db;DB_CLOSE_DELAY=-1");
 		dataSource.setUsername("sa");
 		dataSource.setPassword("sa");
 

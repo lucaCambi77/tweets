@@ -18,7 +18,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-@Table(name = "USER_TWEET_RUN", schema = "TWEET")
+//@Table(name = "USER_TWEET_RUN", schema = "TWEET")
 public class UserTweet implements java.io.Serializable {
 
 	private UserTweetId id;

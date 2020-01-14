@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-@Table(name = "TWEET_RUN", schema = "TWEET")
+//@Table(name = "TWEET_RUN", schema = "TWEET")
 public class TweetRun implements java.io.Serializable {
 
 	private BigInteger id;
