@@ -136,7 +136,7 @@ public class TwitterRunTest extends Constant
     @Test
     @DatabaseSetups({
         @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
-        @DatabaseSetup(value = "classpath:sample.xml", connection="dataSource", type = DatabaseOperation.CLEAN_INSERT)
+        @DatabaseSetup(value = "classpath:sample.xml", connection="dataSource", type = DatabaseOperation.INSERT)
 
     })
     public void testRunList() throws Exception
@@ -146,7 +146,6 @@ public class TwitterRunTest extends Constant
         List<Run> aRun = objectMapper.readValue(entity.getBody(), new TypeReference<List<Run>>()
         {
         });
-
 
         assertEquals(1, aRun.size());
         assertEquals(100, aRun.get(0).getRunId());
