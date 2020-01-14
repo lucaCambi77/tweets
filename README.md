@@ -34,7 +34,7 @@ To install
 
 To run  
 
-	- java -jar target/*.jar
+	- mvn spring-boot:run
 		
 ## docker (running inside docker container)
 
