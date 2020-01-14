@@ -45,6 +45,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.github.springtestdbunit.annotation.DbUnitConfiguration;
@@ -54,8 +55,8 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 @TestPropertySource(locations = "/test.properties")
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class, DbUnitTestExecutionListener.class })
-@DbUnitConfiguration(databaseConnection = { "dataSource" })
 @ActiveProfiles("test")
+@DbUnitConfiguration(databaseConnection = {"dataSource"})
 public class TwitterRunTest extends Constant
 {
 
@@ -159,8 +160,8 @@ public class TwitterRunTest extends Constant
     }
 
     @Test
-    @DatabaseTearDown
-    //@DatabaseSetup("classpath:sample.xml")
+    @DatabaseTearDown(connection="dataSource")
+    @DatabaseSetup(value = "classpath:sample.xml", connection="dataSource", type = DatabaseOperation.INSERT)
     public void testRunList() throws Exception
     {
         ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
