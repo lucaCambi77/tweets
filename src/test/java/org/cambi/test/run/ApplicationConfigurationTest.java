@@ -15,6 +15,7 @@ import java.util.Properties;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.cambi.dto.ObjectMapperFactory;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
@@ -25,10 +26,12 @@ import org.cambi.test.config.StatusRun;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -57,110 +60,99 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 @ComponentScan(basePackageClasses = TwitterService.class)
 public class ApplicationConfigurationTest
 {
-    @Mock
-    private TwitterAuthenticator authenticator;
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Mock
+	private TwitterAuthenticator authenticator;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
 
-    @Bean
-    public TwitterAuthenticator getTwitterAuthenticator() throws TwitterAuthenticationException, IOException
-    {
-        MockitoAnnotations.initMocks(this);
+	@Autowired
+	private Environment env;
 
-        /**
-         * We read tweets from a file to create a fake request
-         * 
-         * Mocking google Transport
-         */
-        HttpTransport transport = new MockHttpTransport()
-        {
-            @Override
-            public LowLevelHttpRequest buildRequest(String method, String url) throws IOException
-            {
-                return new MockLowLevelHttpRequest()
-                {
-                    @Override
-                    public LowLevelHttpResponse execute() throws IOException
-                    {
+	@Bean
+	public TwitterAuthenticator getTwitterAuthenticator() throws TwitterAuthenticationException, IOException {
+		MockitoAnnotations.initMocks(this);
 
-                        InputStream is = new FileInputStream("src/test/resources/tweets.json");
-                        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+		/**
+		 * We read tweets from a file to create a fake request
+		 * 
+		 * Mocking google Transport
+		 */
+		HttpTransport transport = new MockHttpTransport() {
+			@Override
+			public LowLevelHttpRequest buildRequest(String method, String url) throws IOException {
+				return new MockLowLevelHttpRequest() {
+					@Override
+					public LowLevelHttpResponse execute() throws IOException {
 
-                        String line = buf.readLine();
-                        StringBuilder sb = new StringBuilder();
+						InputStream is = new FileInputStream("src/test/resources/tweets.json");
+						BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 
-                        while (line != null)
-                        {
-                            sb.append(line).append("\n");
-                            line = buf.readLine();
-                        }
-                        buf.close();
+						String line = buf.readLine();
+						StringBuilder sb = new StringBuilder();
 
-                        StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
-                        sb = new StringBuilder();
+						while (line != null) {
+							sb.append(line).append("\n");
+							line = buf.readLine();
+						}
+						buf.close();
 
-                        for (TweetRun tweet : status.getTweets())
-                        {
-                            sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
-                        }
+						StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
+						sb = new StringBuilder();
 
-                        MockLowLevelHttpResponse response = new MockLowLevelHttpResponse();
-                        response.setStatusCode(200);
-                        response.setContentType(Json.MEDIA_TYPE);
-                        response.setContent(sb.toString());
-                        return response;
-                    }
-                };
-            }
-        };
+						for (TweetRun tweet : status.getTweets()) {
+							sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
+						}
 
-        when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
-        return authenticator;
-    }
+						MockLowLevelHttpResponse response = new MockLowLevelHttpResponse();
+						response.setStatusCode(200);
+						response.setContentType(Json.MEDIA_TYPE);
+						response.setContent(sb.toString());
+						return response;
+					}
+				};
+			}
+		};
 
-    @Autowired
-    private Environment env;
+		when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
+		return authenticator;
+	}
 
-    @Bean
-    @Profile("test")
-    public DataSource dataSource()
-    {
-        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:mem:db;INIT=CREATE SCHEMA IF NOT EXISTS TWEET;DB_CLOSE_DELAY=-1");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("sa");
+	@Bean
+	@Profile("test")
+	public DataSource dataSource() {
+		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.h2.Driver");
+		dataSource.setUrl("jdbc:h2:mem:db;INIT=CREATE SCHEMA IF NOT EXISTS TWEET;DB_CLOSE_DELAY=-1");
+		dataSource.setUsername("sa");
+		dataSource.setPassword("sa");
 
-        return dataSource;
-    }
+		return dataSource;
+	}
 
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory()
-    {
-        final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[] { Run.class.getPackage().getName() });
-        em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        em.setJpaProperties(additionalProperties());
-        return em;
-    }
+	@Bean
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+		em.setDataSource(dataSource());
+		em.setPackagesToScan(new String[] { Run.class.getPackage().getName() });
+		em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+		em.setJpaProperties(additionalProperties());
+		return em;
+	}
 
-    @Bean
-    JpaTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory)
-    {
-        final JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory);
-        return transactionManager;
-    }
+	@Bean
+	JpaTransactionManager transactionManager(final EntityManagerFactory entityManagerFactory) {
+		final JpaTransactionManager transactionManager = new JpaTransactionManager();
+		transactionManager.setEntityManagerFactory(entityManagerFactory);
+		return transactionManager;
+	}
 
-    final Properties additionalProperties()
-    {
-        final Properties hibernateProperties = new Properties();
+	final Properties additionalProperties() {
+		final Properties hibernateProperties = new Properties();
 
-        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.ddl-auto"));
-        hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        hibernateProperties.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-
-        return hibernateProperties;
-    }
+		hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.ddl-auto"));
+		hibernateProperties.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
+		hibernateProperties.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+		return hibernateProperties;
+	}
 }

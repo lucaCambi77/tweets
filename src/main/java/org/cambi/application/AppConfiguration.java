@@ -4,7 +4,6 @@
 package org.cambi.application;
 
 import org.cambi.constant.Constant;
-import org.cambi.dto.ObjectMapperFactory;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.repository.UserRepository;
@@ -19,8 +18,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author luca
@@ -37,12 +34,6 @@ public class AppConfiguration extends Constant {
 	@Bean
 	public TwitterAuthenticator getTwitterAuthenticator() {
 		return new TwitterAuthenticator(CONSUMER_KEY, CONSUMER_SECRET);
-	}
-
-	@Bean
-	@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public ObjectMapper getObjectMapper() {
-		return new ObjectMapperFactory().getObjectMapper();
 	}
 
 	@Bean

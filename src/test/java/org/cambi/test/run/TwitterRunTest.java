@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.cambi.application.AppConfigObjectMapper;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
@@ -49,7 +50,7 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { Application.class, ApplicationConfigurationTest.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { Application.class, ApplicationConfigurationTest.class, AppConfigObjectMapper.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/test.properties")
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class, DbUnitTestExecutionListener.class })
@@ -60,8 +61,9 @@ public class TwitterRunTest extends Constant
 
     private static final Logger log = LoggerFactory.getLogger(TwitterRunTest.class);
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
+	@Autowired
+	private ObjectMapper objectMapper;
+	
     @Autowired
     private TweetRepository twitterRepository;
 
@@ -158,7 +160,7 @@ public class TwitterRunTest extends Constant
 
     @Test
     @DatabaseTearDown
-    @DatabaseSetup("classpath:sample.xml")
+    //@DatabaseSetup("classpath:sample.xml")
     public void testRunList() throws Exception
     {
         ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
