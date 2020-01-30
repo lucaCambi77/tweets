@@ -49,21 +49,22 @@ import com.github.springtestdbunit.annotation.DatabaseSetups;
 import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { Application.class, ApplicationConfigurationTest.class, AppConfigObjectMapper.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { Application.class, ApplicationConfigurationTest.class,
+        AppConfigObjectMapper.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/test.properties")
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
-	TransactionDbUnitTestExecutionListener.class})
+        TransactionDbUnitTestExecutionListener.class })
 @ActiveProfiles("test")
-@DbUnitConfiguration(databaseConnection = {"dataSource"})
+@DbUnitConfiguration(databaseConnection = { "dataSource" }, dataSetLoader = JsonDataSetLoader.class)
 // TODO Dbunit schema handling, @DatabaseTearDown not working
 public class TwitterRunTest extends Constant
 {
 
     private static final Logger log = LoggerFactory.getLogger(TwitterRunTest.class);
 
-	@Autowired
-	private ObjectMapper objectMapper;
-	
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Autowired
     private TweetRepository twitterRepository;
 
@@ -135,8 +136,8 @@ public class TwitterRunTest extends Constant
 
     @Test
     @DatabaseSetups({
-        @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
-        @DatabaseSetup(value = "classpath:sample.xml", connection="dataSource", type = DatabaseOperation.INSERT)
+            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
+            @DatabaseSetup(value = "classpath:sample.json", connection = "dataSource", type = DatabaseOperation.INSERT)
 
     })
     public void testRunList() throws Exception
@@ -155,7 +156,6 @@ public class TwitterRunTest extends Constant
         log.info(objectMapper.writeValueAsString(aRun.get(0)));
         assertEquals(HttpStatus.OK, entity.getStatusCode());
     }
-    
 
     @Test
     public void testGreeting()
@@ -165,7 +165,7 @@ public class TwitterRunTest extends Constant
     }
 
     @Test
-    public void testRunApi() 
+    public void testRunApi()
     {
         ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
                 String.class);

@@ -1,0 +1,12 @@
+{
+	"Run": [
+		{
+			"runId": "100",
+			"ins": "2020-01-01 12:00:00.0",
+			"runTime": 10,
+			"numTweet": 5,
+			"api": "http://localhost:8080",
+			"apiQuery": "?track=trump"
+		}
+	]
+}
