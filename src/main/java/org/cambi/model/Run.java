@@ -86,7 +86,7 @@ public class Run implements java.io.Serializable {
 		this.apiQuery = apiQuery;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = TweetRun.class)
 	public Set<TweetRun> getTweetRuns() {
 		return tweetRuns;
 	}

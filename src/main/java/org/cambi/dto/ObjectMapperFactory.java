@@ -70,7 +70,7 @@ public class ObjectMapperFactory extends Constant {
 		public String getUserName();
 
 		@JsonProperty(SCREEN_NAME)
-		public String getUserSreenName();
+		public String getUserScreenName();
 
 		@JsonProperty(CREATED_AT)
 		public Date getCreationDate();

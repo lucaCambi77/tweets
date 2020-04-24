@@ -37,7 +37,7 @@ public class UserSerializer extends StdSerializer<UserTweet> {
 		jgen.writeStartObject();
 		jgen.writeNumberField("id", value.getId().getUserId().intValue());
 		jgen.writeStringField("name", value.getUserName());
-		jgen.writeStringField("screen_name", value.getUserSreenName());
+		jgen.writeStringField("screen_name", value.getUserScreenName());
 		jgen.writeStringField("created_at", dateFormat.format(value.getCreationDate()));
 
 		jgen.writeEndObject();

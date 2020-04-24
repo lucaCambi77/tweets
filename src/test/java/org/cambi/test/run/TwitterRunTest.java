@@ -1,6 +1,5 @@
 package org.cambi.test.run;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
@@ -30,19 +29,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,9 +52,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/test.properties")
+@ActiveProfiles("test")
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class, DbUnitTestExecutionListener.class})
-@ActiveProfiles("test")
 @DbUnitConfiguration(databaseConnection = {"dataSource"}, dataSetLoader = JsonDataSetLoader.class)
 // TODO Dbunit schema handling, @DatabaseTearDown not working
 public class TwitterRunTest extends Constant {
@@ -85,7 +87,8 @@ public class TwitterRunTest extends Constant {
 
     @Test
     @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
-    public void mockHttpRequest()
+    @Transactional()
+    public void should_create_run_from_tweet_request()
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
         Date start = new Date();
 
@@ -99,6 +102,8 @@ public class TwitterRunTest extends Constant {
         log.info("  **    ****  ****   **** ****  **  ");
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        log.info(objectMapper.writeValueAsString(response));
+
         log.info(objectMapper.writeValueAsString(Utils.sortTweets(response.getTweetRuns())));
 
         log.info(" **** ***   **   *** **** **** **** ");
@@ -111,22 +116,24 @@ public class TwitterRunTest extends Constant {
         /**
          * We have a new Run
          */
-        List<Run> runs = runRepository.findAll();
-        assertTrue(runs.size() == 1);
+        List<Run> runs = twitterService.findAllRun();
+        assertEquals(1, runs.size());
 
         log.info("We have new Tweets");
 
         /**
          * We have 5 tweets
          */
-        List<TweetRun> tweets = twitterRepository.findAll();
-        assertTrue(tweets.size() == 5);
+        Set<TweetRun> tweets = runs.get(0).getTweetRuns();
+        assertEquals(5, tweets.size());
 
         /**
          * We have only 3 users plus 2 empty
          */
-        List<UserTweet> users = userRepository.findAll();
-        assertTrue(users.size() == 3);
+        List<UserTweet> users = tweets.stream()
+                .map(t -> t.getUserTweets()).filter(u -> u != null).collect(Collectors.toList());
+
+        assertEquals(3, users.size());
 
     }
 
@@ -136,33 +143,16 @@ public class TwitterRunTest extends Constant {
             @DatabaseSetup(value = "classpath:sample.json", connection = "dataSource", type = DatabaseOperation.INSERT)
 
     })
-    public void testRunList() throws Exception {
-        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
-                String.class);
-        List<Run> aRun = objectMapper.readValue(entity.getBody(), new TypeReference<List<Run>>() {
-        });
+    @Transactional(readOnly = true)
+    public void should_match_database_status() throws Exception {
+        List<Run> aRun = twitterService.findAllRun();
 
         assertEquals(1, aRun.size());
-        assertEquals(100, aRun.get(0).getRunId());
+        assertEquals(1, aRun.get(0).getRunId());
         assertEquals("?track=trump", aRun.get(0).getApiQuery());
+        assertEquals(1, aRun.get(0).getTweetRuns().size());
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         log.info(objectMapper.writeValueAsString(aRun.get(0)));
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-    }
-
-    @Test
-    public void testGreeting() {
-        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/", String.class);
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-    }
-
-    @Test
-    public void testRunApi() {
-        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
-                String.class);
-        log.info(entity.getBody());
-
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
     }
 }

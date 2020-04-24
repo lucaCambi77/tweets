@@ -15,7 +15,7 @@ public class UserTweet implements java.io.Serializable {
 	private UserTweetId id;
 	private Date creationDate;
 	private String userName;
-	private String userSreenName;
+	private String userScreenName;
 	private TweetRun tweetRuns;
 
 	public UserTweet() {
@@ -47,12 +47,12 @@ public class UserTweet implements java.io.Serializable {
 	}
 
 	@Column(nullable = false)
-	public String getUserSreenName() {
-		return userSreenName;
+	public String getUserScreenName() {
+		return userScreenName;
 	}
 
-	public void setUserSreenName(String userSreenName) {
-		this.userSreenName = userSreenName;
+	public void setUserScreenName(String userScreenName) {
+		this.userScreenName = userScreenName;
 	}
 
 	@Column(nullable = false, length = 7)

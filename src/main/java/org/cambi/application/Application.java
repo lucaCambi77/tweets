@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 @SpringBootApplication
 @RestController
-@Import(DaoConfig.class)
+@Import(AppDaoConfig.class)
 public class Application extends Constant {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
@@ -80,7 +80,7 @@ public class Application extends Constant {
 
     @GetMapping("/run/list")
     public String runList() throws IOException {
-        return objectMapper.writeValueAsString(runRepository.findAll(Sort.by(Sort.Direction.DESC, "runTime")));
+        return objectMapper.writeValueAsString(twitterService.findAllRun());
     }
 
     @GetMapping("/")

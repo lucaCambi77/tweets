@@ -25,7 +25,7 @@ import java.util.Properties;
 @EnableJpaRepositories(basePackageClasses = UserRepository.class)
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = TwitterService.class)
-public class DaoConfig {
+public class AppDaoConfig {
 
     @Autowired
     private Environment env;
