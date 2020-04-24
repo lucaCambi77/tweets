@@ -1,12 +1,11 @@
 /**
- * 
+ *
  */
 package org.cambi.test.run;
 
+import com.github.springtestdbunit.dataset.AbstractDataSetLoader;
 import org.dbunit.dataset.IDataSet;
 import org.springframework.core.io.Resource;
-
-import com.github.springtestdbunit.dataset.AbstractDataSetLoader;
 
 /**
  * @author luca

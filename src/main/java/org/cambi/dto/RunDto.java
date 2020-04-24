@@ -1,17 +1,16 @@
 /**
- * 
+ *
  */
 package org.cambi.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cambi.constant.Constant;
+import org.cambi.model.TweetRun;
 
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-
-import org.cambi.constant.Constant;
-import org.cambi.model.TweetRun;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author luca

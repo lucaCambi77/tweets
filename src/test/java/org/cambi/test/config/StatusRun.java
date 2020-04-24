@@ -1,11 +1,10 @@
 package org.cambi.test.config;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cambi.constant.Constant;
 import org.cambi.model.TweetRun;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 /**
  * Tweets wrapper for tests

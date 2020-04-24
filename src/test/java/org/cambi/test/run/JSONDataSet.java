@@ -3,15 +3,12 @@
  */
 package org.cambi.test.run;
 
-import java.io.*;
-import java.util.List;
+import org.dbunit.dataset.*;
 
-import org.dbunit.dataset.AbstractDataSet;
-import org.dbunit.dataset.DataSetException;
-import org.dbunit.dataset.DefaultTable;
-import org.dbunit.dataset.DefaultTableIterator;
-import org.dbunit.dataset.ITable;
-import org.dbunit.dataset.ITableIterator;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author luca

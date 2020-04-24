@@ -1,16 +1,7 @@
 package org.cambi.model;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 
 /**
  * Serialize class for readed tweets.
@@ -18,7 +9,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-//@Table(name = "USER_TWEET_RUN", schema = "TWEET")
+@Table(name = "USER_TWEET_RUN")
 public class UserTweet implements java.io.Serializable {
 
 	private UserTweetId id;

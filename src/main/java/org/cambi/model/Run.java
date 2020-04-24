@@ -1,20 +1,12 @@
 package org.cambi.model;
 // Generated Apr 10, 2018 11:58:47 AM by Hibernate Tools 3.6.0.Final
 
-import static javax.persistence.GenerationType.SEQUENCE;
-
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import static javax.persistence.GenerationType.SEQUENCE;
 
 /**
  * Serialize class for run
@@ -22,7 +14,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-//@Table(name = "RUN", schema = "TWEET")
+@Table(name = "RUN")
 public class Run implements java.io.Serializable {
 
 	private Long runId;

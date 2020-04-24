@@ -1,14 +1,13 @@
 /**
- * 
+ *
  */
 package org.cambi.service;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
+import com.google.api.client.http.HttpRequestFactory;
 import org.cambi.model.Run;
 
-import com.google.api.client.http.HttpRequestFactory;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author luca
@@ -18,7 +17,7 @@ public interface ITwitterService {
 
 	/**
 	 * @param authorizedHttpRequestFactory
-	 * @param concat
+	 * @param path
 	 * @return
 	 * @throws IOException
 	 * @throws InterruptedException

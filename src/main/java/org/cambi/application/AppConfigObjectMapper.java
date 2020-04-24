@@ -1,23 +1,20 @@
 /**
- * 
+ *
  */
 package org.cambi.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.dto.ObjectMapperFactory;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author luca
  *
  */
 @Configuration
-@Profile({ "production", "test" })
 public class AppConfigObjectMapper {
 
 

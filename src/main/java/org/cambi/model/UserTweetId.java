@@ -1,9 +1,8 @@
 package org.cambi.model;
 
-import java.math.BigInteger;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.math.BigInteger;
 
 /**
  * UserTweetId

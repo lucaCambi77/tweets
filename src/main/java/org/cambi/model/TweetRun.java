@@ -1,20 +1,10 @@
 package org.cambi.model;
 
-import static javax.persistence.GenerationType.SEQUENCE;
-
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import static javax.persistence.GenerationType.SEQUENCE;
 
 /**
  * Serialize class for readed tweets.
@@ -22,7 +12,7 @@ import javax.persistence.Table;
  * @author luca
  */
 @Entity
-//@Table(name = "TWEET_RUN", schema = "TWEET")
+@Table(name = "TWEET_RUN")
 public class TweetRun implements java.io.Serializable {
 
 	private BigInteger id;
