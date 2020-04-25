@@ -9,10 +9,10 @@
       "id": 967824267948773377,
       "creationDate": "1577836800000",
       "messageText": "From pilot to astronaut, Robert H. Lawrence was the first African-American to be selected as an astronaut by any na… https://t.co/FjPEWnh804",
-      "userTweets": {
+      "userTweet": {
         "id": {
           "userId": 11348282,
-          "messageId": 967928974960545793
+          "messageId": 967824267948773377
         },
         "userName": "NASA",
         "userScreenName": "NASA",
@@ -23,7 +23,7 @@
       "id": 967844427480911872,
       "creationDate": "1577836800000",
       "messageText": "A magnetic power struggle of galactic proportions - new research highlights the role of the Sun's magnetic landscap… https://t.co/29dZgga54m",
-      "userTweets": {
+      "userTweet": {
         "id": {
           "userId": 11348283,
           "messageId": 967844427480911872
@@ -37,7 +37,7 @@
       "id": 968204446625869827,
       "creationDate": "1577836800000",
       "messageText": "Someone's got to be first. In space, the first explorers beyond Mars were Pioneers 10 and 11, twin robots who chart… https://t.co/SUX30Y45mr",
-      "userTweets": {
+      "userTweet": {
         "id": {
           "userId": 11348282,
           "messageId": 968204446625869827

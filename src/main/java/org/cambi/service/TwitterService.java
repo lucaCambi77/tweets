@@ -103,21 +103,21 @@ public class TwitterService extends Constant implements ITwitterService {
             /**
              * Users
              */
-            if (null != aTweet.getUserTweets()) {
+            if (null != aTweet.getUserTweet()) {
 
                 UserTweet user = new UserTweet();
-                user.setCreationDate(aTweet.getUserTweets().getCreationDate());
+                user.setCreationDate(aTweet.getUserTweet().getCreationDate());
                 user.setTweetRuns(savedTweet);
-                user.setUserName(aTweet.getUserTweets().getUserName());
-                user.setUserScreenName(aTweet.getUserTweets().getUserScreenName());
-                user.setId(new UserTweetId(aTweet.getUserTweets().getId().getUserId(), savedTweet.getId()));
+                user.setUserName(aTweet.getUserTweet().getUserName());
+                user.setUserScreenName(aTweet.getUserTweet().getUserScreenName());
+                user.setId(new UserTweetId(aTweet.getUserTweet().getId().getUserId(), savedTweet.getId()));
 
                 userRepository.save(user);
 
             }
         });
 
-        return newRun;
+        return savedRun;
     }
 
     @Override

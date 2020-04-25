@@ -1,20 +1,29 @@
 {
-	"Run": [
-		{
-			"runId": "1",
-			"ins": "2020-01-01 12:00:00.0",
-			"runTime": 10,
-			"numTweet": 5,
-			"api": "http://localhost:8080",
-			"apiQuery": "?track=trump"
-		}
-	],
-	"Tweet_Run": [
-		{
-			"run_runId": "1",
-			"id": "1",
-			"creationDate": "2020-01-01 12:00:00.0",
-			"messageText": "This is a tweet"
-		}
-	]
+  "Run": [
+    {
+      "runId": "1",
+      "ins": "2020-01-01 12:00:00.0",
+      "runTime": 10,
+      "numTweet": 5,
+      "api": "http://localhost:8080",
+      "apiQuery": "?track=trump"
+    }
+  ],
+  "Tweet_Run": [
+    {
+      "id": "1",
+      "runId": "1",
+      "creationDate": "2020-01-01 12:00:00.0",
+      "messageText": "This is a tweet"
+    }
+  ],
+  "USER_TWEET_RUN": [
+    {
+      "userId": 1,
+      "messageId": 1,
+      "creationDate": "2020-01-01 12:00:00.0",
+      "userName": "JhonnyNoPapa",
+      "userScreenName": "Jhonny"
+    }
+  ]
 }

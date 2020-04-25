@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -70,16 +70,16 @@ public class TwitterServiceUnitTest extends Constant {
 
         Run run = objectMapper.readValue(file, Run.class);
 
-        when(twitterService.parseTweetsFromRequest(any(), anyString()))
+        Mockito.lenient().when(twitterService.parseTweetsFromRequest(any(), anyString()))
                 .thenReturn(objectMapper.readValue(file, Run.class));
 
-        when(twitterService.createRun(run, elapse.getTime(), DEFAULT_API, search)).thenReturn(run);
+        Mockito.lenient().when(twitterService.createRun(run, elapse.getTime(), DEFAULT_API, search)).thenReturn(run);
 
-        when(runRepository.findAll()).thenReturn(Arrays.asList(run));
-        when(twitterRepository.findAll()).thenReturn(run.getTweetRuns()
+        Mockito.lenient().when(runRepository.findAll()).thenReturn(Arrays.asList(run));
+        Mockito.lenient().when(twitterRepository.findAll()).thenReturn(run.getTweetRuns()
                 .stream().collect(Collectors.toList()));
-        when(userRepository.findAll()).thenReturn(run.getTweetRuns().stream()
-                .map(t -> t.getUserTweets()).filter(u -> u != null).collect(Collectors.toList()));
+        Mockito.lenient().when(userRepository.findAll()).thenReturn(run.getTweetRuns().stream()
+                .map(t -> t.getUserTweet()).filter(u -> u != null).collect(Collectors.toList()));
     }
 
     @Test
@@ -108,8 +108,18 @@ public class TwitterServiceUnitTest extends Constant {
         List<TweetRun> tweets = twitterRepository.findAll();
         assertEquals(5, tweets.size());
 
+        tweets.stream().filter(t -> t.getUserTweet() != null).forEach(t -> {
+                    assertEquals(t.getId(),
+                            t.getUserTweet().getId().getMessageId());
+                }
+        );
+
         List<UserTweet> users = userRepository.findAll();
         assertEquals(3, users.size());
+
+        users.forEach(u -> {
+            assertNotNull(u.getId());
+        });
 
     }
 

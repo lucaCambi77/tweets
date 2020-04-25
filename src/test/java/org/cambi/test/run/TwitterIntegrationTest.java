@@ -11,8 +11,6 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
-import org.cambi.model.TweetRun;
-import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.repository.RunRepository;
@@ -35,19 +33,14 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -57,9 +50,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         TransactionDbUnitTestExecutionListener.class, DbUnitTestExecutionListener.class})
 @DbUnitConfiguration(databaseConnection = {"dataSource"}, dataSetLoader = JsonDataSetLoader.class)
 // TODO Dbunit schema handling, @DatabaseTearDown not working
-public class TwitterRunTest extends Constant {
+public class TwitterIntegrationTest extends Constant {
 
-    private static final Logger log = LoggerFactory.getLogger(TwitterRunTest.class);
+    private static final Logger log = LoggerFactory.getLogger(TwitterIntegrationTest.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -110,31 +103,11 @@ public class TwitterRunTest extends Constant {
         log.info("  **   *** **** ***  **   **    **  ");
         log.info("  **    ****  ****   **** ****  **  ");
 
-        twitterService.createRun(response, new Date().getTime() - start.getTime(), DEFAULT_API, "?track=bieber");
+        Run run = twitterService.createRun(response, new Date().getTime() - start.getTime(), DEFAULT_API, "?track=bieber");
 
         log.info("We have a new Run");
-        /**
-         * We have a new Run
-         */
-        List<Run> runs = twitterService.findAllRun();
-        assertEquals(1, runs.size());
 
-        log.info("We have new Tweets");
-
-        /**
-         * We have 5 tweets
-         */
-        Set<TweetRun> tweets = runs.get(0).getTweetRuns();
-        assertEquals(5, tweets.size());
-
-        /**
-         * We have only 3 users plus 2 empty
-         */
-        List<UserTweet> users = tweets.stream()
-                .map(t -> t.getUserTweets()).filter(u -> u != null).collect(Collectors.toList());
-
-        assertEquals(3, users.size());
-
+        assertNotNull(run.getRunId());
     }
 
     @Test
@@ -151,6 +124,7 @@ public class TwitterRunTest extends Constant {
         assertEquals(1, aRun.get(0).getRunId());
         assertEquals("?track=trump", aRun.get(0).getApiQuery());
         assertEquals(1, aRun.get(0).getTweetRuns().size());
+        assertNotNull(aRun.get(0).getTweetRuns().iterator().next().getUserTweet().getId());
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         log.info(objectMapper.writeValueAsString(aRun.get(0)));

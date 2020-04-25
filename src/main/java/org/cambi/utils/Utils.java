@@ -23,13 +23,13 @@ public class Utils {
 		LinkedHashMap<Object, List<TweetRun>> tweetByUser = tweets.stream().sorted(new Comparator<TweetRun>() {
 			@Override
 			public int compare(final TweetRun lhs, TweetRun rhs) {
-				long dateleft = lhs.getUserTweets() == null ? 0 : lhs.getUserTweets().getCreationDate().getTime();
-				long dateRight = rhs.getUserTweets() == null ? 0 : rhs.getUserTweets().getCreationDate().getTime();
+				long dateleft = lhs.getUserTweet() == null ? 0 : lhs.getUserTweet().getCreationDate().getTime();
+				long dateRight = rhs.getUserTweet() == null ? 0 : rhs.getUserTweet().getCreationDate().getTime();
 
 				return Long.signum(dateleft - dateRight);
 			}
 		}).collect(Collectors.groupingBy(
-				p -> Optional.ofNullable(p.getUserTweets() == null ? null : p.getUserTweets().getId().getUserId()),
+				p -> Optional.ofNullable(p.getUserTweet() == null ? null : p.getUserTweet().getId().getUserId()),
 				LinkedHashMap::new, Collectors.toList()));
 
 		for (List<TweetRun> userTweetList : tweetByUser.values()) {
