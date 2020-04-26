@@ -16,18 +16,7 @@ import java.util.concurrent.ExecutionException;
  */
 public interface ITwitterService {
 
-    /**
-     * @param authorizedHttpRequestFactory
-     * @param path
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    Run parseTweetsFromRequest(HttpRequestFactory authorizedHttpRequestFactory, String path)
-            throws IOException, InterruptedException, ExecutionException;
-
-    Run createRun(Run runDto, Long elapse, String endPoint, String query);
-
     List<Run> findAllRun();
+
+    Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException;
 }

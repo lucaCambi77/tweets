@@ -43,7 +43,7 @@ import java.util.concurrent.ExecutionException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class})
 @TestPropertySource(locations = "/test.properties")
 @ActiveProfiles("test")
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
@@ -58,52 +58,32 @@ public class TwitterIntegrationTest extends Constant {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private TweetRepository twitterRepository;
-
-    @Autowired
-    private RunRepository runRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private ITwitterService twitterService;
 
     @Autowired
     private TwitterAuthenticator authenticator;
-
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
 
     @Test
     @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
     @Transactional()
     public void should_create_run_from_tweet_request()
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
-        Date start = new Date();
 
-        Run response = twitterService.parseTweetsFromRequest(authenticator.getAuthorizedHttpRequestFactory(),
-                DEFAULT_API.concat("?track=bieber"));
-
-        assertTrue(response.getTweetRuns().size() == 5);
+        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+                DEFAULT_API, "?track=bieber");
 
         log.info(" **** ***   **   *** **** **** **** ");
         log.info("  **   *** **** ***  **   **    **  ");
         log.info("  **    ****  ****   **** ****  **  ");
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        log.info(objectMapper.writeValueAsString(response));
+        log.info(objectMapper.writeValueAsString(run));
 
-        log.info(objectMapper.writeValueAsString(Utils.sortTweets(response.getTweetRuns())));
+        log.info(objectMapper.writeValueAsString(Utils.sortTweets(run.getTweetRuns())));
 
         log.info(" **** ***   **   *** **** **** **** ");
         log.info("  **   *** **** ***  **   **    **  ");
         log.info("  **    ****  ****   **** ****  **  ");
-
-        Run run = twitterService.createRun(response, new Date().getTime() - start.getTime(), DEFAULT_API, "?track=bieber");
 
         log.info("We have a new Run");
 

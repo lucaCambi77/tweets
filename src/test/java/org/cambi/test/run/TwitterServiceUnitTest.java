@@ -3,13 +3,8 @@ package org.cambi.test.run;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
-import org.cambi.model.TweetRun;
-import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
 import org.cambi.service.TwitterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,17 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
@@ -40,16 +31,7 @@ public class TwitterServiceUnitTest extends Constant {
 
     private static final Logger log = LoggerFactory.getLogger(TwitterServiceUnitTest.class);
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    @Mock
-    private TweetRepository twitterRepository;
-
-    @Mock
-    private RunRepository runRepository;
-
-    @Mock
-    private UserRepository userRepository;
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private TwitterService twitterService;
@@ -57,69 +39,66 @@ public class TwitterServiceUnitTest extends Constant {
     @Mock
     private TwitterAuthenticator authenticator;
 
-    private static Date elapse = new Date();
-
     private static String search = "?track=bieber";
 
+    private static
+    Run run;
+
+    static {
+        try {
+            run = objectMapper.readValue(new File("src/test/resources/run.json"), Run.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @BeforeEach
-    public void setUp() throws IOException, ExecutionException, InterruptedException {
+    public void setUp() throws IOException, ExecutionException, InterruptedException, TwitterAuthenticationException {
 
-        String path = "src/test/resources/run.json";
+        Mockito.lenient().when(twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+                DEFAULT_API, search)).thenCallRealMethod();
 
-        File file = new File(path);
+        Mockito.lenient().when(twitterService.parseTweetsFrom(any(), anyString()))
+                .thenReturn(run);
 
-        Run run = objectMapper.readValue(file, Run.class);
+        Mockito.lenient().when(twitterService.createRun(any(), anyLong(), anyString(), anyString())).thenReturn(run);
 
-        Mockito.lenient().when(twitterService.parseTweetsFromRequest(any(), anyString()))
-                .thenReturn(objectMapper.readValue(file, Run.class));
-
-        Mockito.lenient().when(twitterService.createRun(run, elapse.getTime(), DEFAULT_API, search)).thenReturn(run);
-
-        Mockito.lenient().when(runRepository.findAll()).thenReturn(Arrays.asList(run));
-        Mockito.lenient().when(twitterRepository.findAll()).thenReturn(run.getTweetRuns()
-                .stream().collect(Collectors.toList()));
-        Mockito.lenient().when(userRepository.findAll()).thenReturn(run.getTweetRuns().stream()
-                .map(t -> t.getUserTweet()).filter(u -> u != null).collect(Collectors.toList()));
     }
 
     @Test
     public void should_parse_tweet_from_request() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        Run response = twitterService.parseTweetsFromRequest(authenticator.getAuthorizedHttpRequestFactory(),
+        Run response = twitterService.parseTweetsFrom(authenticator.getAuthorizedHttpRequestFactory(),
                 DEFAULT_API.concat(search));
 
+        assertEquals(response.getRunId(), run.getRunId());
         assertTrue(response.getTweetRuns().size() == 5);
 
     }
 
     @Test
+    public void should_invoke_methods_while_create_run() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
+
+        twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+                DEFAULT_API, search);
+
+        Mockito.verify(twitterService
+                , Mockito.times(1)).parseTweetsFrom(authenticator.getAuthorizedHttpRequestFactory(), DEFAULT_API.concat(search));
+
+        Mockito.verify(twitterService
+                , Mockito.times(1)).createRun(authenticator.getAuthorizedHttpRequestFactory(),
+                DEFAULT_API, search);
+
+    }
+
+
+    @Test
     public void should_create_run() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        Run response = twitterService.parseTweetsFromRequest(authenticator.getAuthorizedHttpRequestFactory(),
-                DEFAULT_API.concat(search));
+        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+                DEFAULT_API, search);
 
-        Run run = twitterService.createRun(response, elapse.getTime(), DEFAULT_API, search);
-
-        assertEquals(response.getRunId(), run.getRunId());
-
-        List<Run> runs = runRepository.findAll();
-        assertEquals(1, runs.size());
-
-        List<TweetRun> tweets = twitterRepository.findAll();
-        assertEquals(5, tweets.size());
-
-        tweets.stream().filter(t -> t.getUserTweet() != null).forEach(t -> {
-                    assertEquals(t.getId(),
-                            t.getUserTweet().getId().getMessageId());
-                }
-        );
-
-        List<UserTweet> users = userRepository.findAll();
-        assertEquals(3, users.size());
-
-        users.forEach(u -> {
-            assertNotNull(u.getId());
-        });
+        assertNotNull(run.getRunId());
 
     }
 

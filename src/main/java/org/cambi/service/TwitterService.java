@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -39,15 +38,8 @@ public class TwitterService extends Constant implements ITwitterService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Parse Tweet method to return a Run to persist
-     *
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
-    @Override
-    public Run parseTweetsFromRequest(HttpRequestFactory httpRequestFactory, String path)
-            throws IOException, InterruptedException, ExecutionException {
+    public Run parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
+            throws InterruptedException, ExecutionException {
         log.info("I am looking for tweets...");
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -71,6 +63,22 @@ public class TwitterService extends Constant implements ITwitterService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Run> findAllRun() {
+        return runRepository.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
+    }
+
+    @Override
+    public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
+        Date start = new Date();
+
+        Run response = this.parseTweetsFrom(authorizedHttpRequestFactory,
+                api.concat(query));
+
+        return this.createRun(response, new Date().getTime() - start.getTime(), api, query);
+
+    }
+
     @Transactional
     public Run createRun(Run runDto, Long elapse, String endPoint, String query) {
 
@@ -89,40 +97,32 @@ public class TwitterService extends Constant implements ITwitterService {
 
         Run savedRun = runRepository.save(newRun);
 
-        /**
-         * Tweets
-         */
-        tweetDto.forEach(aTweet -> {
-            TweetRun tweetRun = new TweetRun();
-            tweetRun.setCreationDate(aTweet.getCreationDate());
-            tweetRun.setMessageText(aTweet.getMessageText());
-
-            tweetRun.setRun(savedRun);
-            TweetRun savedTweet = twitterRepository.save(tweetRun);
-
-            /**
-             * Users
-             */
-            if (null != aTweet.getUserTweet()) {
-
-                UserTweet user = new UserTweet();
-                user.setCreationDate(aTweet.getUserTweet().getCreationDate());
-                user.setTweetRuns(savedTweet);
-                user.setUserName(aTweet.getUserTweet().getUserName());
-                user.setUserScreenName(aTweet.getUserTweet().getUserScreenName());
-                user.setId(new UserTweetId(aTweet.getUserTweet().getId().getUserId(), savedTweet.getId()));
-
-                userRepository.save(user);
-
-            }
-        });
+        for (TweetRun tweetRun : tweetDto) {
+            TweetRun savedTweet = saveTweets(tweetRun, savedRun);
+            saveTweet(tweetRun, savedTweet);
+        }
 
         return savedRun;
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Run> findAllRun() {
-        return runRepository.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
+    public void saveTweet(TweetRun tweetRun, TweetRun savedTweet) {
+        if (null != tweetRun.getUserTweet()) {
+            UserTweet user = new UserTweet();
+            user.setTweetRuns(savedTweet);
+            user.setCreationDate(tweetRun.getUserTweet().getCreationDate());
+            user.setUserName(tweetRun.getUserTweet().getUserName());
+            user.setUserScreenName(tweetRun.getUserTweet().getUserScreenName());
+            user.setId(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()));
+        }
+    }
+
+    public TweetRun saveTweets(TweetRun aTweet, Run savedRun) {
+
+        TweetRun tweetRun = new TweetRun();
+        tweetRun.setCreationDate(aTweet.getCreationDate());
+        tweetRun.setMessageText(aTweet.getMessageText());
+        tweetRun.setRun(savedRun);
+
+        return twitterRepository.save(tweetRun);
     }
 }
