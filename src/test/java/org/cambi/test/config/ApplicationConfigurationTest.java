@@ -14,7 +14,6 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import org.cambi.model.TweetRun;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.test.config.StatusRun;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
