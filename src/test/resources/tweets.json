@@ -31,7 +31,7 @@
 			"in_reply_to_user_id": null,
 			"in_reply_to_user_id_str": null,
 			"in_reply_to_screen_name": null,
-			"user": {
+			"userTweet": {
 				"id": 11348282,
 				"id_str": "11348282",
 				"name": "NASA",
@@ -133,9 +133,9 @@
 			"source": "<a href='https://www.sprinklr.com' rel='nofollow'>Sprinklr</a>,in_reply_to_status_id:null,in_reply_to_status_id_str:null,in_reply_to_user_id:null",
 			"in_reply_to_user_id_str": null,
 			"in_reply_to_screen_name": null,
-			"user": {
+			"userTweet": {
 				"id": 11348283,
-				"id_str": "11348282",
+				"id_str": "11348283",
 				"name": "NASA",
 				"screen_name": "NASA",
 				"location": "",
@@ -233,7 +233,7 @@
 				"iso_language_code": "en"
 			},
 			"source": "<a href='https://www.sprinklr.com' rel='nofollow'>Sprinklr</a>,in_reply_to_status_id:null,in_reply_to_status_id_str:null,in_reply_to_user_id:null,in_reply_to_user_id_str:null,in_reply_to_screen_name:null",
-			"user": {
+			"userTweet": {
 				"id": 11348282,
 				"id_str": "11348282",
 				"name": "NASA",
