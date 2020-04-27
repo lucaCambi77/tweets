@@ -6,9 +6,9 @@ import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.model.UserTweetId;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
+import org.cambi.dao.RunDao;
+import org.cambi.dao.TweetDao;
+import org.cambi.dao.UserTweetDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +30,13 @@ public class TwitterService extends Constant implements ITwitterService {
     private TwitterServiceRunnable runnable;
 
     @Autowired
-    private TweetRepository twitterRepository;
+    private TweetDao twitterDao;
 
     @Autowired
-    private RunRepository runRepository;
+    private RunDao runDao;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserTweetDao userDao;
 
     public Run parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
             throws InterruptedException, ExecutionException {
@@ -65,7 +65,7 @@ public class TwitterService extends Constant implements ITwitterService {
     @Override
     @Transactional(readOnly = true)
     public List<Run> findAllRun() {
-        return runRepository.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
+        return runDao.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
     }
 
     @Override
@@ -83,9 +83,18 @@ public class TwitterService extends Constant implements ITwitterService {
     public Run createRun(Run runDto, Long elapse, String endPoint, String query) {
 
         Set<TweetRun> tweetDto = runDto.getTweetRuns();
-        /**
-         * New Run
-         */
+
+        Run savedRun = saveRun(runDto, elapse, endPoint, query, tweetDto);
+
+        for (TweetRun tweetRun : tweetDto) {
+            TweetRun savedTweet = saveTweets(tweetRun, savedRun);
+            saveTweet(tweetRun, savedTweet);
+        }
+
+        return savedRun;
+    }
+
+    private Run saveRun(Run runDto, Long elapse, String endPoint, String query, Set<TweetRun> tweetDto) {
         Run newRun = new Run();
 
         newRun.setApi(endPoint);
@@ -95,14 +104,7 @@ public class TwitterService extends Constant implements ITwitterService {
         newRun.setRunTime(elapse);
         newRun.setException(runDto.getException());
 
-        Run savedRun = runRepository.save(newRun);
-
-        for (TweetRun tweetRun : tweetDto) {
-            TweetRun savedTweet = saveTweets(tweetRun, savedRun);
-            saveTweet(tweetRun, savedTweet);
-        }
-
-        return savedRun;
+        return runDao.save(newRun);
     }
 
     public void saveTweet(TweetRun tweetRun, TweetRun savedTweet) {
@@ -113,6 +115,8 @@ public class TwitterService extends Constant implements ITwitterService {
             user.setUserName(tweetRun.getUserTweet().getUserName());
             user.setUserScreenName(tweetRun.getUserTweet().getUserScreenName());
             user.setId(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()));
+
+            userDao.save(user);
         }
     }
 
@@ -123,6 +127,6 @@ public class TwitterService extends Constant implements ITwitterService {
         tweetRun.setMessageText(aTweet.getMessageText());
         tweetRun.setRun(savedRun);
 
-        return twitterRepository.save(tweetRun);
+        return twitterDao.save(tweetRun);
     }
 }

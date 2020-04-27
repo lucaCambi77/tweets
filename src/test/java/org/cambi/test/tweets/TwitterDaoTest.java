@@ -6,9 +6,9 @@ import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
+import org.cambi.dao.RunDao;
+import org.cambi.dao.TweetDao;
+import org.cambi.dao.UserTweetDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +39,13 @@ public class TwitterDaoTest extends Constant {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
-    private TweetRepository twitterRepository;
+    private TweetDao twitterDao;
 
     @Mock
-    private RunRepository runRepository;
+    private RunDao runDao;
 
     @Mock
-    private UserRepository userRepository;
+    private UserTweetDao userDao;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -56,20 +56,20 @@ public class TwitterDaoTest extends Constant {
 
         Run run = objectMapper.readValue(file, Run.class);
 
-        Mockito.lenient().when(runRepository.findAll()).thenReturn(Arrays.asList(run));
-        Mockito.lenient().when(twitterRepository.findAll()).thenReturn(run.getTweetRuns()
+        Mockito.lenient().when(runDao.findAll()).thenReturn(Arrays.asList(run));
+        Mockito.lenient().when(twitterDao.findAll()).thenReturn(run.getTweetRuns()
                 .stream().collect(Collectors.toList()));
-        Mockito.lenient().when(userRepository.findAll()).thenReturn(run.getTweetRuns().stream()
+        Mockito.lenient().when(userDao.findAll()).thenReturn(run.getTweetRuns().stream()
                 .map(t -> t.getUserTweet()).filter(u -> u != null).collect(Collectors.toList()));
     }
 
     @Test
     public void should_create_run() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        List<Run> runs = runRepository.findAll();
+        List<Run> runs = runDao.findAll();
         assertEquals(1, runs.size());
 
-        List<TweetRun> tweets = twitterRepository.findAll();
+        List<TweetRun> tweets = twitterDao.findAll();
         assertEquals(5, tweets.size());
 
         tweets.stream().filter(t -> t.getUserTweet() != null).forEach(t -> {
@@ -78,7 +78,7 @@ public class TwitterDaoTest extends Constant {
                 }
         );
 
-        List<UserTweet> users = userRepository.findAll();
+        List<UserTweet> users = userDao.findAll();
         assertEquals(3, users.size());
 
         users.forEach(u -> {

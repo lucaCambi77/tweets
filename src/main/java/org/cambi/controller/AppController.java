@@ -1,13 +1,11 @@
 package org.cambi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.repository.RunRepository;
+import org.cambi.dao.RunDao;
 import org.cambi.service.ITwitterService;
 import org.cambi.utils.Utils;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -33,7 +30,7 @@ public class AppController extends Constant {
     private ITwitterService twitterService;
 
     @Autowired
-    private RunRepository runRepository;
+    private RunDao runRepository;
 
     @Autowired
     private ObjectMapper objectMapper;

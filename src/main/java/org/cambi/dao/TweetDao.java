@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.cambi.repository;
+package org.cambi.dao;
 
 import org.cambi.model.TweetRun;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +15,7 @@ import java.util.List;
  *
  */
 @Component
-public interface TweetRepository extends JpaRepository<TweetRun, Long> {
+public interface TweetDao extends JpaRepository<TweetRun, Long> {
 
 	@Query(value = "SELECT t FROM TweetRun t WHERE t.run.runId = ?1")
 	public List<TweetRun> getByRun(Long runId);
