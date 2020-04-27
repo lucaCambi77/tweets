@@ -50,9 +50,7 @@ public class TwitterService extends Constant implements ITwitterService {
             future.cancel(true);
         } finally {
 
-            Set<TweetRun> tweets = runnable.getTweets();
-
-            run.setTweetRuns(tweets);
+            run.setTweetRuns(runnable.getTweets());
             run.setException(runnable.getException());
         }
 

@@ -25,94 +25,90 @@ import java.util.Set;
 @Service
 public class TwitterServiceRunnable implements Runnable {
 
-	private static final Logger log = LoggerFactory.getLogger(TwitterServiceRunnable.class);
+    private static final Logger log = LoggerFactory.getLogger(TwitterServiceRunnable.class);
 
-	@Autowired
-	private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-	private HttpRequestFactory authenticator;
+    private HttpRequestFactory authenticator;
 
-	private String path;
+    private String path;
 
-	private Set<TweetRun> tweets;
+    private Set<TweetRun> tweets;
 
-	private String exception;
+    private String exception;
 
-	/**
-	 *
-	 */
-	public TwitterServiceRunnable() {
+    /**
+     *
+     */
+    public TwitterServiceRunnable() {
 
-	}
+    }
 
-	/**
-	 * Max number of tweets
-	 */
-	private static int MAX_TWEET_SIZE = 100;
+    /**
+     * Max number of tweets
+     */
+    private static int MAX_TWEET_SIZE = 100;
 
-	@Override
-	public void run() {
-		tweets = new HashSet<TweetRun>();
+    @Override
+    public void run() {
+        tweets = new HashSet<TweetRun>();
 
-		try {
-			InputStream in = getAuthenticator().buildGetRequest(new GenericUrl(getPath())).execute().getContent();
+        try {
+            InputStream in = getAuthenticator().buildGetRequest(new GenericUrl(getPath())).execute().getContent();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			String line = reader.readLine();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = reader.readLine();
 
-			int countTweets = 0;
+            int countTweets = 0;
 
-			/**
-			 * We wait for X seconds or up to Y messages
-			 */
-			while (line != null && !Thread.interrupted()) {
+            /**
+             * We wait for X seconds or up to Y messages
+             */
+            while (line != null && !Thread.interrupted()) {
 
-				if (countTweets == MAX_TWEET_SIZE)
-					break;
+                if (countTweets == MAX_TWEET_SIZE)
+                    break;
 
-				countTweets++;
+                tweets.add(objectMapper.readValue(line, TweetRun.class));
 
-				TweetRun tweet = objectMapper.readValue(line, TweetRun.class);
+                line = reader.readLine();
 
-				tweets.add(tweet);
+                log.info("Number of Tweets: " + (++countTweets));
+            }
 
-				line = reader.readLine();
+        } catch (Exception e) {
 
-				log.info("Number of Tweets: " + countTweets);
-			}
+            exception = e.getMessage();
+            log.info(e.getMessage());
+        }
+    }
 
-		} catch (Exception e) {
+    public String getPath() {
+        return path;
+    }
 
-			exception = e.getMessage();
-			log.info(e.getMessage());
-		}
-	}
+    public TwitterServiceRunnable setPath(String path) {
+        this.path = path;
 
-	public String getPath() {
-		return path;
-	}
+        return this;
+    }
 
-	public TwitterServiceRunnable setPath(String path) {
-		this.path = path;
+    public HttpRequestFactory getAuthenticator() {
+        return authenticator;
+    }
 
-		return this;
-	}
+    public TwitterServiceRunnable setAuthenticator(HttpRequestFactory authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
 
-	public HttpRequestFactory getAuthenticator() {
-		return authenticator;
-	}
+    public Set<TweetRun> getTweets() {
+        return tweets;
+    }
 
-	public TwitterServiceRunnable setAuthenticator(HttpRequestFactory authenticator) {
-		this.authenticator = authenticator;
-		return this;
-	}
-
-	public Set<TweetRun> getTweets() {
-		return tweets;
-	}
-
-	public String getException() {
-		return exception;
-	}
+    public String getException() {
+        return exception;
+    }
 
 }
