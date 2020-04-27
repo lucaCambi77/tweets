@@ -126,6 +126,7 @@ public class TwitterIntegrationTest extends Constant {
 
         assertEquals(5, findAllRun.get(0).getTweetRuns().size());
 
+        assertEquals(3, findAllRun.get(0).getTweetRuns().stream().filter(t -> t.getUserTweet() != null).count());
 
     }
 }
