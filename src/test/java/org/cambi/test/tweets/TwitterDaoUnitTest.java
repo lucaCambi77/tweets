@@ -30,8 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 public class TwitterDaoUnitTest extends Constant {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     @Mock
     private TweetDao twitterDao;
 
@@ -47,7 +45,7 @@ public class TwitterDaoUnitTest extends Constant {
 
     static {
         try {
-            run = objectMapper.readValue(new File("src/test/resources/run.json"), Run.class);
+            run = new ObjectMapper().readValue(new File("src/test/resources/run.json"), Run.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

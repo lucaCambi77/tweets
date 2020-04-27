@@ -33,8 +33,6 @@ import static org.mockito.ArgumentMatchers.*;
 @ExtendWith(MockitoExtension.class)
 public class TwitterServiceUnitTest extends Constant {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     @Mock
     private TwitterService twitterService;
 
@@ -59,7 +57,7 @@ public class TwitterServiceUnitTest extends Constant {
 
     static {
         try {
-            run = objectMapper.readValue(new File("src/test/resources/run.json"), Run.class);
+            run = new ObjectMapper().readValue(new File("src/test/resources/run.json"), Run.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
