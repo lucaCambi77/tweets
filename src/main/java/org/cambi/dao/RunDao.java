@@ -12,15 +12,16 @@ import java.util.Date;
 @Component
 public interface RunDao extends JpaRepository<Run, Long> {
 
-    default Run saveRun(Run newRun, Long elapse, String endPoint, String query, int tweetSize) {
+    default Run saveRun(Long elapse, String endPoint, String query, int tweetsNum) {
 
-        newRun.setApi(endPoint);
-        newRun.setApiQuery(query);
-        newRun.setIns(new Date());
-        newRun.setNumTweet(tweetSize);
-        newRun.setRunTime(elapse);
-
-        return save(newRun);
+        return save(
+                Run.builder()
+                        .api(endPoint).
+                        apiQuery(query).
+                        ins(new Date()).
+                        numTweet(tweetsNum).
+                        runTime(elapse)
+                        .build());
     }
 
 }

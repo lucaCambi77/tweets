@@ -18,14 +18,14 @@ public interface UserTweetDao extends JpaRepository<UserTweet, UserTweetId> {
 
 
     default UserTweet saveUserTweet(TweetRun tweetRun, TweetRun savedTweet) {
-        UserTweet user = new UserTweet();
-        user.setTweetRuns(savedTweet);
-        user.setCreationDate(tweetRun.getUserTweet().getCreationDate());
-        user.setUserName(tweetRun.getUserTweet().getUserName());
-        user.setUserScreenName(tweetRun.getUserTweet().getUserScreenName());
-        user.setId(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()));
-        save(user);
 
-        return user;
+        return
+                save(UserTweet.builder()
+                        .id(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()))
+                        .userName(tweetRun.getUserTweet().getUserName())
+                        .userScreenName(tweetRun.getUserTweet().getUserScreenName())
+                        .creationDate(tweetRun.getUserTweet().getCreationDate())
+                        .build());
+
     }
 }
