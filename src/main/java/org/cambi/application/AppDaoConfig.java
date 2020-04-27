@@ -1,5 +1,6 @@
 package org.cambi.application;
 
+import org.cambi.controller.AppController;
 import org.cambi.dao.UserTweetDao;
 import org.cambi.model.Run;
 import org.cambi.service.TwitterService;
@@ -24,7 +25,7 @@ import java.util.Properties;
 @Import({AppConfigObjectMapper.class, AppConfiguration.class})
 @EnableJpaRepositories(basePackageClasses = UserTweetDao.class)
 @EnableTransactionManagement
-@ComponentScan(basePackageClasses = TwitterService.class)
+@ComponentScan(basePackageClasses = {TwitterService.class, AppController.class})
 public class AppDaoConfig {
 
     @Autowired
