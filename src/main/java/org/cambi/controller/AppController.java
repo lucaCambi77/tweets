@@ -2,10 +2,10 @@ package org.cambi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
+import org.cambi.dao.RunDao;
 import org.cambi.model.Run;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.dao.RunDao;
 import org.cambi.service.ITwitterService;
 import org.cambi.utils.Utils;
 import org.slf4j.Logger;

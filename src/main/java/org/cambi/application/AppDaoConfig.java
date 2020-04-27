@@ -1,7 +1,7 @@
 package org.cambi.application;
 
-import org.cambi.model.Run;
 import org.cambi.dao.UserTweetDao;
+import org.cambi.model.Run;
 import org.cambi.service.TwitterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

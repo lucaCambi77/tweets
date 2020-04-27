@@ -2,13 +2,11 @@ package org.cambi.service;
 
 import com.google.api.client.http.HttpRequestFactory;
 import org.cambi.constant.Constant;
-import org.cambi.model.Run;
-import org.cambi.model.TweetRun;
-import org.cambi.model.UserTweet;
-import org.cambi.model.UserTweetId;
 import org.cambi.dao.RunDao;
 import org.cambi.dao.TweetDao;
 import org.cambi.dao.UserTweetDao;
+import org.cambi.model.Run;
+import org.cambi.model.TweetRun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +28,7 @@ public class TwitterService extends Constant implements ITwitterService {
     private TwitterServiceRunnable runnable;
 
     @Autowired
-    private TweetDao twitterDao;
+    private TweetDao tweetDao;
 
     @Autowired
     private RunDao runDao;
@@ -80,53 +78,21 @@ public class TwitterService extends Constant implements ITwitterService {
     }
 
     @Transactional
-    public Run createRun(Run runDto, Long elapse, String endPoint, String query) {
+    public Run createRun(Run run, Long elapse, String endPoint, String query) {
 
-        Set<TweetRun> tweetDto = runDto.getTweetRuns();
+        Set<TweetRun> tweetDto = run.getTweetRuns();
 
-        Run savedRun = saveRun(runDto, elapse, endPoint, query, tweetDto);
+        Run savedRun = runDao.saveRun(run, elapse, endPoint, query, tweetDto.size());
 
         for (TweetRun tweetRun : tweetDto) {
-            TweetRun savedTweet = saveTweets(tweetRun, savedRun);
-            saveTweet(tweetRun, savedTweet);
+            TweetRun savedTweet = tweetDao.saveTweets(tweetRun, savedRun);
+
+            if (null != tweetRun.getUserTweet())
+                userDao.saveUserTweet(tweetRun, savedTweet);
         }
 
         return savedRun;
     }
 
-    private Run saveRun(Run runDto, Long elapse, String endPoint, String query, Set<TweetRun> tweetDto) {
-        Run newRun = new Run();
 
-        newRun.setApi(endPoint);
-        newRun.setApiQuery(query);
-        newRun.setIns(new Date());
-        newRun.setNumTweet(tweetDto.size());
-        newRun.setRunTime(elapse);
-        newRun.setException(runDto.getException());
-
-        return runDao.save(newRun);
-    }
-
-    public void saveTweet(TweetRun tweetRun, TweetRun savedTweet) {
-        if (null != tweetRun.getUserTweet()) {
-            UserTweet user = new UserTweet();
-            user.setTweetRuns(savedTweet);
-            user.setCreationDate(tweetRun.getUserTweet().getCreationDate());
-            user.setUserName(tweetRun.getUserTweet().getUserName());
-            user.setUserScreenName(tweetRun.getUserTweet().getUserScreenName());
-            user.setId(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()));
-
-            userDao.save(user);
-        }
-    }
-
-    public TweetRun saveTweets(TweetRun aTweet, Run savedRun) {
-
-        TweetRun tweetRun = new TweetRun();
-        tweetRun.setCreationDate(aTweet.getCreationDate());
-        tweetRun.setMessageText(aTweet.getMessageText());
-        tweetRun.setRun(savedRun);
-
-        return twitterDao.save(tweetRun);
-    }
 }
