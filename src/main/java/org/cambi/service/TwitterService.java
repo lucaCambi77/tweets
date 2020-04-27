@@ -80,7 +80,7 @@ public class TwitterService extends Constant implements ITwitterService {
 
         Run savedRun = runDao.saveRun(elapse, endPoint, query, tweetDto.size());
 
-        Map<Optional<UserTweet>, List<TweetRun>> tweetsSorted = Utils.sortTweets(tweetDto);
+        Map<Optional<UserTweet>, List<TweetRun>> tweetsSorted = getSortedTweetsMap(tweetDto);
 
         for (Map.Entry<Optional<UserTweet>, List<TweetRun>> listByUser : tweetsSorted.entrySet()) {
 
@@ -95,6 +95,10 @@ public class TwitterService extends Constant implements ITwitterService {
         }
 
         return savedRun;
+    }
+
+    private Map<Optional<UserTweet>, List<TweetRun>> getSortedTweetsMap(Set<TweetRun> tweetDto) {
+        return Utils.sortTweets(tweetDto);
     }
 
 
