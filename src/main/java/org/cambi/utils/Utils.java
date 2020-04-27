@@ -3,8 +3,8 @@
  */
 package org.cambi.utils;
 
-import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
+import org.cambi.model.UserTweet;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,15 +15,9 @@ import java.util.stream.Collectors;
  */
 public class Utils {
 
-    /**
-     * @param tweets
-     * @return
-     */
-    public static LinkedHashMap<Object, List<TweetRun>> sortTweets(Set<TweetRun> tweets) {
+    public static Map<Optional<UserTweet>, List<TweetRun>> sortTweets(Set<TweetRun> tweets) {
 
-        Objects.requireNonNull(tweets);
-
-        LinkedHashMap<Object, List<TweetRun>> tweetByUser = tweets.stream().sorted(new Comparator<TweetRun>() {
+        Map<Optional<UserTweet>, List<TweetRun>> tweetByUser = tweets.stream().sorted(new Comparator<TweetRun>() {
             @Override
             public int compare(final TweetRun lhs, TweetRun rhs) {
                 long dateleft = lhs.getUserTweet() == null ? 0 : lhs.getUserTweet().getCreationDate().getTime();
@@ -31,9 +25,7 @@ public class Utils {
 
                 return Long.signum(dateleft - dateRight);
             }
-        }).collect(Collectors.groupingBy(
-                p -> Optional.ofNullable(p.getUserTweet() == null ? null : p.getUserTweet().getId().getUserId()),
-                LinkedHashMap::new, Collectors.toList()));
+        }).collect(Collectors.groupingBy(p -> Optional.ofNullable(p.getUserTweet())));
 
         for (List<TweetRun> userTweetList : tweetByUser.values()) {
             userTweetList.sort(new Comparator<TweetRun>() {
@@ -43,6 +35,7 @@ public class Utils {
                 }
             });
         }
+
         return tweetByUser;
     }
 
