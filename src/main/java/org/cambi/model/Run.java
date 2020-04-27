@@ -3,6 +3,7 @@ package org.cambi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -22,6 +23,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "runId")
 public class Run implements java.io.Serializable {
 
 	private Long runId;
