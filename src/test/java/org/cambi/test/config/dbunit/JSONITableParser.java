@@ -62,7 +62,7 @@ class JSONITableParser {
 
         for (Map<String, Object> row : rows) {
             for (Map.Entry<String, Object> column : row.entrySet()) {
-                columns.add(column.getKey().toLowerCase());
+                columns.add(column.getKey());
             }
         }
 
