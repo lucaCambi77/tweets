@@ -1,4 +1,4 @@
-package org.cambi.test.run;
+package org.cambi.test.tweets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;

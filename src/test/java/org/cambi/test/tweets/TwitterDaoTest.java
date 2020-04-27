@@ -1,4 +1,4 @@
-package org.cambi.test.run;
+package org.cambi.test.tweets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
@@ -6,11 +6,9 @@ import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
-import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.repository.RunRepository;
 import org.cambi.repository.TweetRepository;
 import org.cambi.repository.UserRepository;
-import org.cambi.service.TwitterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

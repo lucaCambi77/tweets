@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.cambi.test.run;
+package org.cambi.test.config.dbunit;
 
 import com.github.springtestdbunit.dataset.AbstractDataSetLoader;
 import org.dbunit.dataset.IDataSet;

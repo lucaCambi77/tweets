@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.cambi.test.run;
+package org.cambi.test.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.HttpTransport;

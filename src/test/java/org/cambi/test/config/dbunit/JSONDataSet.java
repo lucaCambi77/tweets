@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.cambi.test.run;
+package org.cambi.test.config.dbunit;
 
 import org.dbunit.dataset.*;
 

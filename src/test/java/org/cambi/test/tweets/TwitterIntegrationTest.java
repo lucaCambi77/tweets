@@ -1,4 +1,4 @@
-package org.cambi.test.run;
+package org.cambi.test.tweets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -13,10 +13,9 @@ import org.cambi.constant.Constant;
 import org.cambi.model.Run;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
 import org.cambi.service.ITwitterService;
+import org.cambi.test.config.ApplicationConfigurationTest;
+import org.cambi.test.config.dbunit.JsonDataSetLoader;
 import org.cambi.utils.Utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,9 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
@@ -36,7 +32,6 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 

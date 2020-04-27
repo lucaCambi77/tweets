@@ -1,4 +1,4 @@
-package org.cambi.test.run;
+package org.cambi.test.config.dbunit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dbunit.dataset.Column;
