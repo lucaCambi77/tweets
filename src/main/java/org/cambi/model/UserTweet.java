@@ -1,5 +1,9 @@
 package org.cambi.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -10,6 +14,9 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "USER_TWEET_RUN")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserTweet implements java.io.Serializable {
 
     private UserTweetId id;
@@ -17,9 +24,6 @@ public class UserTweet implements java.io.Serializable {
     private String userName;
     private String userScreenName;
     private TweetRun tweetRuns;
-
-    public UserTweet() {
-    }
 
     public UserTweet(UserTweetId id) {
         this.id = id;

@@ -1,6 +1,10 @@
 package org.cambi.model;
 // Generated Apr 10, 2018 11:58:47 AM by Hibernate Tools 3.6.0.Final
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
@@ -15,6 +19,9 @@ import static javax.persistence.GenerationType.SEQUENCE;
  */
 @Entity
 @Table(name = "RUN")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Run implements java.io.Serializable {
 
 	private Long runId;
@@ -25,9 +32,6 @@ public class Run implements java.io.Serializable {
 	private String apiQuery;
 	private Set<TweetRun> tweetRuns = new HashSet<TweetRun>(0);
 	private String exception;
-
-	public Run() {
-	}
 
 	@Id
 	@SequenceGenerator(name = "rungenerator", sequenceName = "RUN_SEQUENCE", allocationSize = 1)

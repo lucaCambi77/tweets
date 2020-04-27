@@ -1,5 +1,9 @@
 package org.cambi.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
@@ -13,6 +17,9 @@ import static javax.persistence.GenerationType.SEQUENCE;
  */
 @Entity
 @Table(name = "TWEET_RUN")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TweetRun implements java.io.Serializable {
 
     private BigInteger id;
@@ -20,9 +27,6 @@ public class TweetRun implements java.io.Serializable {
     private Date creationDate;
     private String messageText;
     private UserTweet userTweet;
-
-    public TweetRun() {
-    }
 
     public TweetRun(BigInteger id) {
         this.id = id;
