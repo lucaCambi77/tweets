@@ -114,7 +114,13 @@ public class TwitterServiceUnitTest extends Constant {
         assertNotNull(output.getRunId());
 
         Mockito.verify(runDao, Mockito.times(1)).saveRun(any(), any(), anyString(), anyString(), anyInt());
-        Mockito.verify(twitterDao, Mockito.times(5)).saveTweets(any(), any());
+
+        run.getTweetRuns().forEach(t -> {
+
+            Mockito.verify(twitterDao, Mockito.times(1)).saveTweets(t, run);
+
+        });
+
         Mockito.verify(userDao, Mockito.times(3)).saveUserTweet(any(), any());
 
     }
