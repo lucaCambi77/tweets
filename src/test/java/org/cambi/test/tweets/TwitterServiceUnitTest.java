@@ -109,11 +109,12 @@ public class TwitterServiceUnitTest extends Constant {
     @Test
     public void should_create_run() {
 
-        Run output = twitterServiceInject.createRun(run, new Date().getTime(), DEFAULT_API, search);
+        Date elapse = new Date();
+        Run output = twitterServiceInject.createRun(run, elapse.getTime(), DEFAULT_API, search);
 
         assertNotNull(output.getRunId());
 
-        Mockito.verify(runDao, Mockito.times(1)).saveRun(any(), any(), anyString(), anyString(), anyInt());
+        Mockito.verify(runDao, Mockito.times(1)).saveRun(run, elapse.getTime(), DEFAULT_API, search, run.getTweetRuns().size());
 
         run.getTweetRuns().forEach(t -> {
 
