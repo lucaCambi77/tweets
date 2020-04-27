@@ -72,9 +72,13 @@ public class TwitterServiceUnitTest extends Constant {
         Mockito.lenient().when(twitterService.parseTweetsFrom(any(), anyString()))
                 .thenReturn(run);
 
-        Mockito.lenient().when(runDao.saveRun(any(), anyLong(), anyString(), anyString(), anyInt())).thenReturn(run);
-        Mockito.lenient().when(twitterDao.saveTweets(any(), any())).thenReturn(new TweetRun());
-        Mockito.lenient().when(userDao.saveUserTweet(any(), any())).thenReturn(new UserTweet());
+        Mockito.lenient().when(runDao.saveRun(anyLong(), anyString(), anyString(), anyInt())).thenCallRealMethod();
+        Mockito.lenient().when(twitterDao.saveTweets(any(), any(), any())).thenCallRealMethod();
+        Mockito.lenient().when(userDao.saveUserTweet(any(), any())).thenCallRealMethod();
+
+        Mockito.lenient().when(runDao.save(run)).thenReturn(run);
+        Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
+        Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
 
     }
 
@@ -108,19 +112,17 @@ public class TwitterServiceUnitTest extends Constant {
     public void should_create_run() {
 
         Date elapse = new Date();
-        Run output = twitterServiceInject.createRun(run, elapse.getTime(), DEFAULT_API, search);
+        twitterServiceInject.createRun(run.getTweetRuns(), elapse.getTime(), DEFAULT_API, search);
 
-        assertNotNull(output.getRunId());
+        Mockito.verify(runDao, Mockito.times(1)).saveRun(elapse.getTime(), DEFAULT_API, search, run.getTweetRuns().size());
 
-        Mockito.verify(runDao, Mockito.times(1)).saveRun(run, elapse.getTime(), DEFAULT_API, search, run.getTweetRuns().size());
+        Mockito.verify(runDao, Mockito.times(1)).save(any());
 
-        run.getTweetRuns().forEach(t -> {
-
-            Mockito.verify(twitterDao, Mockito.times(1)).saveTweets(t, run);
-
-        });
+        Mockito.verify(twitterDao, Mockito.times(5)).saveTweets(any(), any(), any());
+        Mockito.verify(twitterDao, Mockito.times(5)).save(any());
 
         Mockito.verify(userDao, Mockito.times(3)).saveUserTweet(any(), any());
+        Mockito.verify(userDao, Mockito.times(3)).save(any());
 
     }
 

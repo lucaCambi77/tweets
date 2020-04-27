@@ -1,5 +1,7 @@
 package org.cambi.test.tweets;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
@@ -11,18 +13,19 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
-import org.cambi.oauth.twitter.TwitterAuthenticationException;
-import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.service.ITwitterService;
 import org.cambi.test.config.ApplicationConfigurationTest;
 import org.cambi.test.config.dbunit.JsonDataSetLoader;
-import org.cambi.utils.Utils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
@@ -31,15 +34,13 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class})
+@SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/test.properties")
 @ActiveProfiles("test")
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
@@ -56,35 +57,11 @@ public class TwitterIntegrationTest extends Constant {
     @Autowired
     private ITwitterService twitterService;
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
-    private TwitterAuthenticator authenticator;
-
-    @Test
-    @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
-    @Transactional()
-    public void should_create_run_from_tweet_request()
-            throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
-
-        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
-                DEFAULT_API, "?track=bieber");
-
-        log.info(" **** ***   **   *** **** **** **** ");
-        log.info("  **   *** **** ***  **   **    **  ");
-        log.info("  **    ****  ****   **** ****  **  ");
-
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        log.info(objectMapper.writeValueAsString(run));
-
-        log.info(objectMapper.writeValueAsString(Utils.sortTweets(run.getTweetRuns())));
-
-        log.info(" **** ***   **   *** **** **** **** ");
-        log.info("  **   *** **** ***  **   **    **  ");
-        log.info("  **    ****  ****   **** ****  **  ");
-
-        log.info("We have a new Run");
-
-        assertNotNull(run.getRunId());
-    }
+    private TestRestTemplate restTemplate;
 
     @Test
     @DatabaseSetups({
@@ -104,5 +81,51 @@ public class TwitterIntegrationTest extends Constant {
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         log.info(objectMapper.writeValueAsString(aRun.get(0)));
+    }
+
+    @Test
+    public void should_get_greeting_from_api_call() {
+        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/", String.class);
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+    }
+
+    @Test
+    @DatabaseSetups({
+            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
+
+    })
+    public void should_create_run_from_api_call() {
+        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
+                String.class);
+        log.info(entity.getBody());
+
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+    }
+
+    @Test
+    @DatabaseSetups({
+            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
+
+    })
+    public void should_find_runs_from_api_call() throws JsonProcessingException {
+        ResponseEntity<String> run = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
+                String.class);
+        assertEquals(HttpStatus.OK, run.getStatusCode());
+
+        ResponseEntity<String> findAll = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
+                String.class);
+
+        assertEquals(HttpStatus.OK, findAll.getStatusCode());
+
+        log.info(findAll.getBody());
+
+        List<Run> findAllRun = objectMapper.readValue(findAll.getBody(), new TypeReference<List<Run>>() {
+        });
+
+        assertEquals(1, findAllRun.size());
+
+        assertEquals(5, findAllRun.get(0).getTweetRuns().size());
+
+
     }
 }
