@@ -7,6 +7,8 @@ import org.cambi.dao.TweetDao;
 import org.cambi.dao.UserTweetDao;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
+import org.cambi.model.UserTweet;
+import org.cambi.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Service
@@ -80,11 +80,18 @@ public class TwitterService extends Constant implements ITwitterService {
 
         Run savedRun = runDao.saveRun(elapse, endPoint, query, tweetDto.size());
 
-        for (TweetRun tweetRun : tweetDto) {
-            TweetRun savedTweet = tweetDao.saveTweets(tweetRun.getCreationDate(), tweetRun.getMessageText(), savedRun);
+        Map<Optional<UserTweet>, List<TweetRun>> tweetsSorted = Utils.sortTweets(tweetDto);
 
-            if (null != tweetRun.getUserTweet())
-                userDao.saveUserTweet(tweetRun, savedTweet);
+        for (Map.Entry<Optional<UserTweet>, List<TweetRun>> listByUser : tweetsSorted.entrySet()) {
+
+            for (TweetRun tweet : listByUser.getValue()) {
+
+                TweetRun savedTweet = tweetDao.saveTweets(tweet.getCreationDate(), tweet.getMessageText(), savedRun);
+
+                if (null != tweet.getUserTweet())
+                    userDao.saveUserTweet(tweet, savedTweet);
+            }
+
         }
 
         return savedRun;
