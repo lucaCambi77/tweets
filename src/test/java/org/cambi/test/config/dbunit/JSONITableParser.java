@@ -38,7 +38,7 @@ class JSONITableParser {
     private DefaultTable createTable(String tableName,
                                      List<Map<String, Object>> rows) throws DataSetException {
 
-        Column[] columns = getColumns(tableName, rows);
+        Column[] columns = getColumns(rows);
         DefaultTable table = new DefaultTable(
                 new DefaultTableMetaData(tableName, columns));
 
@@ -57,7 +57,7 @@ class JSONITableParser {
 
     }
 
-    private Column[] getColumns(String tableName, List<Map<String, Object>> rows) {
+    private Column[] getColumns(List<Map<String, Object>> rows) {
         Set<String> columns = new LinkedHashSet<String>();
 
         for (Map<String, Object> row : rows) {
