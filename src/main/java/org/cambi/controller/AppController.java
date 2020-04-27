@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -45,19 +46,18 @@ public class AppController extends Constant {
      * @throws ExecutionException
      */
     @GetMapping("/run")
-    public String run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
-                      @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
+    public Run run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
+                   @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+        return twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
                 api, query);
 
-        return objectMapper.writeValueAsString(Utils.sortTweets(run.getTweetRuns()));
     }
 
     @GetMapping("/run/list")
-    public String runList() throws IOException {
-        return objectMapper.writeValueAsString(twitterService.findAllRun());
+    public List<Run> runList() throws IOException {
+        return twitterService.findAllRun();
     }
 
     @GetMapping("/")
