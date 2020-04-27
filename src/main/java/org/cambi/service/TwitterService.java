@@ -71,19 +71,17 @@ public class TwitterService extends Constant implements ITwitterService {
         Run response = this.parseTweetsFrom(authorizedHttpRequestFactory,
                 api.concat(query));
 
-        return this.createRun(response, new Date().getTime() - start.getTime(), api, query);
+        return this.createRun(response.getTweetRuns(), new Date().getTime() - start.getTime(), api, query);
 
     }
 
     @Transactional
-    public Run createRun(Run run, Long elapse, String endPoint, String query) {
+    public Run createRun(Set<TweetRun> tweetDto, Long elapse, String endPoint, String query) {
 
-        Set<TweetRun> tweetDto = run.getTweetRuns();
-
-        Run savedRun = runDao.saveRun(run, elapse, endPoint, query, tweetDto.size());
+        Run savedRun = runDao.saveRun(elapse, endPoint, query, tweetDto.size());
 
         for (TweetRun tweetRun : tweetDto) {
-            TweetRun savedTweet = tweetDao.saveTweets(tweetRun, savedRun);
+            TweetRun savedTweet = tweetDao.saveTweets(tweetRun.getCreationDate(), tweetRun.getMessageText(), savedRun);
 
             if (null != tweetRun.getUserTweet())
                 userDao.saveUserTweet(tweetRun, savedTweet);
