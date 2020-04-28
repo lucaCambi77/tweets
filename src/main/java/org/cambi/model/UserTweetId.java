@@ -10,56 +10,67 @@ import java.math.BigInteger;
 @Embeddable
 public class UserTweetId implements java.io.Serializable {
 
-	private BigInteger userId;
-	private BigInteger messageId;
+    private BigInteger userId;
+    private BigInteger messageId;
+    private Long runId;
 
-	public UserTweetId() {
-	}
+    public UserTweetId() {
+    }
 
-	public UserTweetId(BigInteger userId, BigInteger messageId) {
-		this.userId = userId;
-		this.messageId = messageId;
-	}
+    public UserTweetId(BigInteger userId, BigInteger messageId, Long runId) {
+        this.userId = userId;
+        this.messageId = messageId;
+        this.runId = runId;
+    }
 
-	@Column(nullable = false, precision = 50, scale = 0)
-	public BigInteger getUserId() {
-		return userId;
-	}
+    @Column(nullable = false, precision = 50, scale = 0)
+    public BigInteger getUserId() {
+        return userId;
+    }
 
-	public void setUserId(BigInteger runId) {
-		this.userId = runId;
-	}
+    public void setUserId(BigInteger runId) {
+        this.userId = runId;
+    }
 
-	@Column(nullable = false, precision = 50, scale = 0)
-	public BigInteger getMessageId() {
-		return messageId;
-	}
+    @Column(nullable = false, precision = 50, scale = 0)
+    public BigInteger getMessageId() {
+        return messageId;
+    }
 
-	public void setMessageId(BigInteger messageId) {
-		this.messageId = messageId;
-	}
+    @Column(nullable = false, precision = 50, scale = 0)
+    public Long getRunId() {
+        return runId;
+    }
 
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof UserTweetId))
-			return false;
-		UserTweetId castOther = (UserTweetId) other;
+    public void setMessageId(BigInteger messageId) {
+        this.messageId = messageId;
+    }
 
-		return ((this.getUserId() == castOther.getUserId()) || (this.getUserId() != null
-				&& castOther.getUserId() != null && this.getUserId().equals(castOther.getUserId())))
-				&& ((this.getMessageId() == castOther.getMessageId()) || (this.getMessageId() != null
-						&& castOther.getMessageId() != null && this.getMessageId().equals(castOther.getMessageId())));
-	}
+    public void setRunId(Long runId) {
+        this.runId = runId;
+    }
 
-	public int hashCode() {
-		int result = 17;
+    public boolean equals(Object other) {
+        if ((this == other))
+            return true;
+        if ((other == null))
+            return false;
+        if (!(other instanceof UserTweetId))
+            return false;
+        UserTweetId castOther = (UserTweetId) other;
 
-		result = 37 * result + (getUserId() == null ? 0 : this.getUserId().hashCode());
-		result = 37 * result + (getMessageId() == null ? 0 : this.getMessageId().hashCode());
-		return result;
-	}
+        return ((this.getUserId() == castOther.getUserId()) || (this.getUserId() != null
+                && castOther.getUserId() != null && this.getUserId().equals(castOther.getUserId())))
+                && ((this.getMessageId() == castOther.getMessageId()) || (this.getMessageId() != null
+                && castOther.getMessageId() != null && this.getMessageId().equals(castOther.getMessageId())));
+    }
+
+    public int hashCode() {
+        int result = 17;
+
+        result = 37 * result + (getUserId() == null ? 0 : this.getUserId().hashCode());
+        result = 37 * result + (getMessageId() == null ? 0 : this.getMessageId().hashCode());
+        return result;
+    }
 
 }

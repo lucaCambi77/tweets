@@ -23,7 +23,6 @@ import static javax.persistence.GenerationType.SEQUENCE;
 public class TweetRun implements java.io.Serializable {
 
     private BigInteger id;
-    private Run run;
     private Date creationDate;
     private String messageText;
     private UserTweet userTweet;
@@ -45,8 +44,8 @@ public class TweetRun implements java.io.Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, insertable = true, updatable = false, name = "runId")
-    public Run getRun() {
-        return run;
+    public UserTweet getUserTweet() {
+        return userTweet;
     }
 
     public void setRun(Run run) {

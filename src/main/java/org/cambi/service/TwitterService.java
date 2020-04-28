@@ -88,8 +88,8 @@ public class TwitterService extends Constant implements ITwitterService {
 
                 TweetRun savedTweet = tweetDao.saveTweets(tweet.getCreationDate(), tweet.getMessageText(), savedRun);
 
-                if (null != tweet.getUserTweet())
-                    userDao.saveUserTweet(tweet, savedTweet);
+                if (listByUser.getKey().isPresent())
+                    userDao.saveUserTweet(listByUser.getKey().get(), savedTweet);
             }
 
         }

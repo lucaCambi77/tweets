@@ -32,7 +32,7 @@ public class Run implements java.io.Serializable {
 	private int numTweet;
 	private String api;
 	private String apiQuery;
-	private Set<TweetRun> tweetRuns = new HashSet<TweetRun>(0);
+	private Set<UserTweet> tweetRuns = new HashSet<UserTweet>(0);
 	private String exception;
 
 	@Id
@@ -92,12 +92,12 @@ public class Run implements java.io.Serializable {
 		this.apiQuery = apiQuery;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = TweetRun.class)
-	public Set<TweetRun> getTweetRuns() {
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = UserTweet.class)
+	public Set<UserTweet> getTweetRuns() {
 		return tweetRuns;
 	}
 
-	public void setTweetRuns(Set<TweetRun> tweetRuns) {
+	public void setTweetRuns(Set<UserTweet> tweetRuns) {
 		this.tweetRuns = tweetRuns;
 	}
 

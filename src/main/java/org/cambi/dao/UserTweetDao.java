@@ -17,14 +17,14 @@ import org.springframework.stereotype.Component;
 public interface UserTweetDao extends JpaRepository<UserTweet, UserTweetId> {
 
 
-    default UserTweet saveUserTweet(TweetRun tweetRun, TweetRun savedTweet) {
+    default UserTweet saveUserTweet(UserTweet userTweet, TweetRun savedTweet) {
 
         return
                 save(UserTweet.builder()
-                        .id(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()))
-                        .userName(tweetRun.getUserTweet().getUserName())
-                        .userScreenName(tweetRun.getUserTweet().getUserScreenName())
-                        .creationDate(tweetRun.getUserTweet().getCreationDate())
+                        .id(new UserTweetId(userTweet.getId().getUserId(), savedTweet.getId()))
+                        .userName(userTweet.getUserName())
+                        .userScreenName(userTweet.getUserScreenName())
+                        .creationDate(userTweet.getCreationDate())
                         .build());
 
     }

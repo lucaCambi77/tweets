@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Serialize class for readed tweets.
@@ -25,16 +26,14 @@ public class UserTweet implements java.io.Serializable {
     private Date creationDate;
     private String userName;
     private String userScreenName;
-    private TweetRun tweetRuns;
-
-    public UserTweet(UserTweetId id) {
-        this.id = id;
-    }
+    private Set<TweetRun> tweetRuns;
+    private Run run;
 
     @EmbeddedId
     @AttributeOverrides({
             @AttributeOverride(name = "userId", column = @Column(name = "userId", nullable = false, precision = 50, scale = 0)),
-            @AttributeOverride(name = "messageId", column = @Column(name = "messageId", nullable = false, precision = 50, scale = 0))})
+            @AttributeOverride(name = "messageId", column = @Column(name = "messageId", nullable = false, precision = 50, scale = 0)),
+            @AttributeOverride(name = "runId", column = @Column(name = "runId", nullable = false, precision = 50, scale = 0))})
     public UserTweetId getId() {
         return id;
     }
@@ -70,13 +69,12 @@ public class UserTweet implements java.io.Serializable {
         this.creationDate = creationDate;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "messageId", insertable = false, updatable = false)
-    public TweetRun getTweetRuns() {
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = TweetRun.class)
+    public Set<TweetRun> getTweetRuns() {
         return tweetRuns;
     }
 
-    public void setTweetRuns(TweetRun tweetRuns) {
+    public void setTweetRuns(Set<TweetRun> tweetRuns) {
         this.tweetRuns = tweetRuns;
     }
 
