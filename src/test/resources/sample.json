@@ -11,8 +11,7 @@
   ],
   "Tweet_Run": [
     {
-      "id": "1",
-      "runId": "1",
+      "messageId": "1",
       "creationDate": "2020-01-01 12:00:00.0",
       "messageText": "This is a tweet"
     }
@@ -21,6 +20,7 @@
     {
       "userId": 1,
       "messageId": 1,
+      "run_runId" : 1,
       "creationDate": "2020-01-01 12:00:00.0",
       "userName": "JhonnyNoPapa",
       "userScreenName": "Jhonny"

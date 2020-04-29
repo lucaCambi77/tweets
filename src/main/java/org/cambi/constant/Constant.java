@@ -37,7 +37,7 @@ public class Constant {
 
 	public static final String TEXT = "text";
 
-	public static final String USER = "user";
+	public static final String USER = "userTweet";
 
 	public static final String USER_ID = "id";
 

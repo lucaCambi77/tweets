@@ -3,52 +3,26 @@
  */
 package org.cambi.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cambi.constant.Constant;
-import org.cambi.model.TweetRun;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author luca
  *
  */
-public class RunDto extends Constant {
+@Getter
+@Setter
+public class RunDto {
 
-	@JsonIgnore
-	private List<TweetRun> tweets;
-
-	@JsonProperty(TWEETS)
-	private Map<BigInteger, List<TweetRun>> tweetsByUser;
-
-	@JsonProperty(EXCEPTION)
-	private String exception = "";
-
-	public Map<BigInteger, List<TweetRun>> getTweetsByUser() {
-		return tweetsByUser;
-	}
-
-	public void setTweetsByUser(Map<BigInteger, List<TweetRun>> tweets) {
-		this.tweetsByUser = tweets;
-	}
-
-	public String getException() {
-		return exception;
-	}
-
-	public void setException(String exception) {
-		this.exception = exception;
-	}
-
-	public List<TweetRun> getTweets() {
-		return tweets;
-	}
-
-	public void setTweets(List<TweetRun> tweets) {
-		this.tweets = tweets;
-	}
-
+    private Long runId;
+    private Set<TweetDto> tweets;
+    private Date ins;
+    private long runTime;
+    private int numTweet;
+    private String api;
+    private String apiQuery;
+    private String exception;
 }

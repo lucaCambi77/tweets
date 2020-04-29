@@ -6,7 +6,7 @@ package org.cambi.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequestFactory;
-import org.cambi.model.TweetRun;
+import org.cambi.dto.TweetDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,7 @@ public class TwitterServiceRunnable implements Runnable {
 
     private String path;
 
-    private Set<TweetRun> tweets;
-
+    private Set<TweetDto> tweets;
     private String exception;
 
     /**
@@ -52,7 +51,7 @@ public class TwitterServiceRunnable implements Runnable {
 
     @Override
     public void run() {
-        tweets = new HashSet<TweetRun>();
+        tweets = new HashSet<TweetDto>();
 
         try {
             InputStream in = getAuthenticator().buildGetRequest(new GenericUrl(getPath())).execute().getContent();
@@ -70,7 +69,7 @@ public class TwitterServiceRunnable implements Runnable {
                 if (countTweets == MAX_TWEET_SIZE)
                     break;
 
-                tweets.add(objectMapper.readValue(line, TweetRun.class));
+                tweets.add(objectMapper.readValue(line, TweetDto.class));
 
                 line = reader.readLine();
 
@@ -79,9 +78,9 @@ public class TwitterServiceRunnable implements Runnable {
 
         } catch (Exception e) {
 
-            exception = e.getMessage();
-            log.info(e.getMessage());
+            throw new RuntimeException((e));
         }
+
     }
 
     public String getPath() {
@@ -103,7 +102,7 @@ public class TwitterServiceRunnable implements Runnable {
         return this;
     }
 
-    public Set<TweetRun> getTweets() {
+    public Set<TweetDto> getTweets() {
         return tweets;
     }
 

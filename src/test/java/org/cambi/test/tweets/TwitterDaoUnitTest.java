@@ -1,6 +1,5 @@
 package org.cambi.test.tweets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
 import org.cambi.dao.RunDao;
 import org.cambi.dao.TweetDao;
@@ -8,6 +7,7 @@ import org.cambi.dao.UserTweetDao;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
+import org.cambi.model.UserTweetId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,11 +17,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.File;
-import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -42,13 +41,32 @@ public class TwitterDaoUnitTest extends Constant {
     private static String search = "?track=bieber";
 
     private static Run run;
+    private static UserTweet userTweets;
+    private static TweetRun tweets;
 
     static {
-        try {
-            run = new ObjectMapper().readValue(new File("src/test/resources/run.json"), Run.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+        tweets = TweetRun.builder()
+                .messageId(new BigInteger("1"))
+                .creationDate(new Date())
+                .messageText("This is a tweet")
+                .build();
+
+        run =
+                Run.builder()
+                        .runId(1L)
+                        .api(DEFAULT_API).
+                        apiQuery(search).
+                        ins(new Date()).
+                        numTweet(1)
+                        .runTime(10)
+                        .build();
+
+        userTweets = UserTweet.builder()
+                .id(new UserTweetId(new BigInteger("1"), tweets))
+                .userName("Name")
+                .userScreenName("ScreenShot")
+                .run(run).build();
     }
 
 
@@ -56,10 +74,8 @@ public class TwitterDaoUnitTest extends Constant {
     public void setUp() {
 
         Mockito.lenient().when(runDao.findAll()).thenReturn(Arrays.asList(run));
-        Mockito.lenient().when(twitterDao.findAll()).thenReturn(run.getTweetRuns()
-                .stream().collect(Collectors.toList()));
-        Mockito.lenient().when(userDao.findAll()).thenReturn(run.getTweetRuns().stream()
-                .map(t -> t.getUserTweet()).filter(u -> u != null).collect(Collectors.toList()));
+        Mockito.lenient().when(twitterDao.findAll()).thenReturn(Arrays.asList(tweets));
+        Mockito.lenient().when(userDao.findAll()).thenReturn(Arrays.asList(userTweets));
 
     }
 
@@ -68,23 +84,16 @@ public class TwitterDaoUnitTest extends Constant {
 
         List<Run> runs = runDao.findAll();
         assertEquals(1, runs.size());
+        assertNotNull(runs.get(0).getRunId());
 
         List<TweetRun> tweets = twitterDao.findAll();
-        assertEquals(5, tweets.size());
-
-        tweets.stream().filter(t -> t.getUserTweet() != null).forEach(t -> {
-                    assertEquals(t.getId(),
-                            t.getUserTweet().getId().getMessageId());
-                }
-        );
+        assertEquals(1, tweets.size());
+        assertNotNull(tweets.get(0).getMessageId());
 
         List<UserTweet> users = userDao.findAll();
-        assertEquals(3, users.size());
-
-        users.forEach(u -> {
-            assertNotNull(u.getId());
-        });
-
+        assertEquals(1, users.size());
+        assertNotNull(users.get(0).getId().getUserId());
+        assertNotNull(users.get(0).getId().getMessageId());
     }
 
 }

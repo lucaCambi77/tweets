@@ -1,5 +1,6 @@
 package org.cambi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -25,11 +26,7 @@ public class UserTweet implements java.io.Serializable {
     private Date creationDate;
     private String userName;
     private String userScreenName;
-    private TweetRun tweetRuns;
-
-    public UserTweet(UserTweetId id) {
-        this.id = id;
-    }
+    private Run run;
 
     @EmbeddedId
     @AttributeOverrides({
@@ -70,14 +67,14 @@ public class UserTweet implements java.io.Serializable {
         this.creationDate = creationDate;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "messageId", insertable = false, updatable = false)
-    public TweetRun getTweetRuns() {
-        return tweetRuns;
+    public void setRun(Run run) {
+        this.run = run;
     }
 
-    public void setTweetRuns(TweetRun tweetRuns) {
-        this.tweetRuns = tweetRuns;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Run.class)
+    @JsonIgnore
+    public Run getRun() {
+        return run;
     }
 
     @Override

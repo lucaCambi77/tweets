@@ -11,7 +11,7 @@ import com.google.api.client.json.Json;
 import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpRequest;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
-import org.cambi.model.TweetRun;
+import org.cambi.dto.TweetDto;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.mockito.Mock;
@@ -70,7 +70,7 @@ public class ApplicationConfigurationTest {
                             StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
                             sb = new StringBuilder();
 
-                            for (TweetRun tweet : status.getTweets()) {
+                            for (TweetDto tweet : status.getTweets()) {
                                 sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
                             }
 
