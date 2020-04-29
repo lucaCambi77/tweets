@@ -80,9 +80,6 @@ public class TwitterServiceUnitTest extends Constant {
                     }
                 });
 
-        Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
-        Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
-
         Mockito.lenient().when(runDao.save(any())).thenReturn(new Run());
         Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
         Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
@@ -118,8 +115,7 @@ public class TwitterServiceUnitTest extends Constant {
     @Test
     public void should_create_run() {
 
-        Date elapse = new Date();
-        twitterServiceInject.createRun(run, elapse.getTime(), DEFAULT_API, search);
+        twitterServiceInject.createRun(run, new Date().getTime(), DEFAULT_API, search);
 
         Mockito.verify(runDao, Mockito.times(1)).save(any());
 
