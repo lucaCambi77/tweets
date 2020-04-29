@@ -1,5 +1,6 @@
 package org.cambi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -58,6 +59,7 @@ public class TweetRun implements java.io.Serializable {
     }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.messageId")
+    @JsonIgnore
     public Set<UserTweet> getUserTweets() {
         return userTweets;
     }

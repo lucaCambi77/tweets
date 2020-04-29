@@ -35,7 +35,6 @@ public class UserTweetId implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "messageId", nullable = false)
     public TweetRun getMessageId() {
         return messageId;

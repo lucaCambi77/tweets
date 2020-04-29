@@ -17,7 +17,7 @@ import java.util.Set;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class RunDto implements Cloneable {
+public class RunDto {
 
     private Long runId;
     private Set<TweetDto> tweets;
@@ -28,8 +28,4 @@ public class RunDto implements Cloneable {
     private String apiQuery;
     private String exception;
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 }

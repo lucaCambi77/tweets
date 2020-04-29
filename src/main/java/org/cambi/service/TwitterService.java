@@ -72,30 +72,37 @@ public class TwitterService extends Constant implements ITwitterService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Set<UserTweet> findByRun(Long runId) {
+        return userDao.findByRun(runId, Sort.by(Sort.Order.asc("creationDate")
+                , Sort.Order.asc("id.messageId")));
+    }
+
+    @Override
     public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
         Date start = new Date();
 
         RunDto response = this.parseTweetsFrom(authorizedHttpRequestFactory,
                 api.concat(query));
 
-        return this.createRun(response, new Date().getTime() - start.getTime(), api, query);
+        return this.createRun(response.getTweets(), new Date().getTime() - start.getTime(), api, query);
     }
 
     @Transactional
-    public Run createRun(RunDto runDto, Long elapse, String endPoint, String query) {
+    public Run createRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
 
-        Map<UserTweetDto, List<TweetDto>> tweetsSorted = getSortedTweetsMap(runDto.getTweets());
+        Map<UserTweetDto, List<TweetDto>> tweets = Utils.tweetsToUserTweet(tweetDto);
 
         Run savedRun = runDao.save(
                 Run.builder()
                         .api(endPoint).
                         apiQuery(query).
                         ins(new Date()).
-                        numTweet(runDto.getTweets().size())
+                        numTweet(tweetDto.size())
                         .runTime(elapse)
                         .build());
 
-        for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweetsSorted.entrySet()) {
+        for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweets.entrySet()) {
 
             for (TweetDto tweet : listByUser.getValue()) {
 
@@ -121,10 +128,5 @@ public class TwitterService extends Constant implements ITwitterService {
 
         return savedRun;
     }
-
-    private Map<UserTweetDto, List<TweetDto>> getSortedTweetsMap(Set<TweetDto> tweetDto) {
-        return Utils.sortTweets(tweetDto);
-    }
-
 
 }

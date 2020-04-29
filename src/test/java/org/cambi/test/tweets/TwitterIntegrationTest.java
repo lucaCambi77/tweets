@@ -13,6 +13,7 @@ import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
+import org.cambi.model.UserTweet;
 import org.cambi.service.ITwitterService;
 import org.cambi.test.config.ApplicationConfigurationTest;
 import org.cambi.test.config.dbunit.JsonDataSetLoader;
@@ -34,7 +35,11 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Type;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -109,6 +114,11 @@ public class TwitterIntegrationTest extends Constant {
         ResponseEntity<String> run = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
                 String.class);
         assertEquals(HttpStatus.OK, run.getStatusCode());
+
+        LinkedHashMap<BigInteger, List<UserTweet>> list = objectMapper.readValue(run.getBody(), new TypeReference<LinkedHashMap<BigInteger, List<UserTweet>>>() {
+        });
+
+        assertEquals(3, list.size());
 
         ResponseEntity<String> findAll = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
                 String.class);
