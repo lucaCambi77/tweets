@@ -2,9 +2,7 @@ package org.cambi.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.cambi.constant.Constant;
 
 import java.math.BigInteger;
@@ -13,6 +11,9 @@ import java.util.Date;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserTweetDto extends Constant {
 
     @JsonProperty(USER_ID)

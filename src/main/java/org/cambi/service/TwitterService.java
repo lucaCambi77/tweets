@@ -82,7 +82,7 @@ public class TwitterService extends Constant implements ITwitterService {
     @Transactional
     public Run createRun(RunDto runDto, Long elapse, String endPoint, String query) {
 
-        Map<Optional<UserTweetDto>, List<TweetDto>> tweetsSorted = getSortedTweetsMap(runDto.getTweets());
+        Map<UserTweetDto, List<TweetDto>> tweetsSorted = getSortedTweetsMap(runDto.getTweets());
 
         Run savedRun = runDao.save(
                 Run.builder()
@@ -93,7 +93,7 @@ public class TwitterService extends Constant implements ITwitterService {
                         .runTime(elapse)
                         .build());
 
-        for (Map.Entry<Optional<UserTweetDto>, List<TweetDto>> listByUser : tweetsSorted.entrySet()) {
+        for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweetsSorted.entrySet()) {
 
             for (TweetDto tweet : listByUser.getValue()) {
 
@@ -106,10 +106,10 @@ public class TwitterService extends Constant implements ITwitterService {
                 tweetDao.save(tweetPost);
 
                 userDao.save(UserTweet.builder()
-                        .id(new UserTweetId(listByUser.getKey().isPresent() ? listByUser.getKey().get().getId() : new BigInteger("-1"), tweetPost))
-                        .userName(listByUser.getKey().isPresent() ? listByUser.getKey().get().getUserName() : "N.A")
-                        .userScreenName(listByUser.getKey().isPresent() ? listByUser.getKey().get().getUserScreenName() : "N.A")
-                        .creationDate(listByUser.getKey().isPresent() ? listByUser.getKey().get().getCreationDate() : new Date(0))
+                        .id(new UserTweetId(listByUser.getKey().getId(), tweetPost))
+                        .userName(listByUser.getKey().getUserName())
+                        .userScreenName(listByUser.getKey().getUserScreenName())
+                        .creationDate(listByUser.getKey().getCreationDate())
                         .run(savedRun)
                         .build());
 
@@ -120,7 +120,7 @@ public class TwitterService extends Constant implements ITwitterService {
         return savedRun;
     }
 
-    private Map<Optional<UserTweetDto>, List<TweetDto>> getSortedTweetsMap(Set<TweetDto> tweetDto) {
+    private Map<UserTweetDto, List<TweetDto>> getSortedTweetsMap(Set<TweetDto> tweetDto) {
         return Utils.sortTweets(tweetDto);
     }
 

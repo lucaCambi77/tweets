@@ -21,4 +21,12 @@ public class TweetDto extends Constant {
     @JsonProperty(USER)
     private UserTweetDto userTweet;
 
+    public UserTweetDto getUserTweet() {
+        return userTweet == null ? UserTweetDto.builder()
+                .id(new BigInteger("-1"))
+                .userName("N.A")
+                .userScreenName("N.A")
+                .creationDate(new Date(0))
+                .build() : userTweet;
+    }
 }
