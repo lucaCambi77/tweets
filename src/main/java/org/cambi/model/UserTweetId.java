@@ -1,7 +1,11 @@
 package org.cambi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.math.BigInteger;
 
 /**
@@ -11,16 +15,14 @@ import java.math.BigInteger;
 public class UserTweetId implements java.io.Serializable {
 
     private BigInteger userId;
-    private BigInteger messageId;
-    private Long runId;
+    private TweetRun messageId;
 
     public UserTweetId() {
     }
 
-    public UserTweetId(BigInteger userId, BigInteger messageId, Long runId) {
+    public UserTweetId(BigInteger userId, TweetRun messageId) {
         this.userId = userId;
         this.messageId = messageId;
-        this.runId = runId;
     }
 
     @Column(nullable = false, precision = 50, scale = 0)
@@ -32,22 +34,15 @@ public class UserTweetId implements java.io.Serializable {
         this.userId = runId;
     }
 
-    @Column(nullable = false, precision = 50, scale = 0)
-    public BigInteger getMessageId() {
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "messageId", nullable = false)
+    public TweetRun getMessageId() {
         return messageId;
     }
 
-    @Column(nullable = false, precision = 50, scale = 0)
-    public Long getRunId() {
-        return runId;
-    }
-
-    public void setMessageId(BigInteger messageId) {
+    public void setMessageId(TweetRun messageId) {
         this.messageId = messageId;
-    }
-
-    public void setRunId(Long runId) {
-        this.runId = runId;
     }
 
     public boolean equals(Object other) {

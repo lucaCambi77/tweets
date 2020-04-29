@@ -1,5 +1,6 @@
 package org.cambi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Serialize class for readed tweets.
@@ -26,14 +26,12 @@ public class UserTweet implements java.io.Serializable {
     private Date creationDate;
     private String userName;
     private String userScreenName;
-    private Set<TweetRun> tweetRuns;
     private Run run;
 
     @EmbeddedId
     @AttributeOverrides({
             @AttributeOverride(name = "userId", column = @Column(name = "userId", nullable = false, precision = 50, scale = 0)),
-            @AttributeOverride(name = "messageId", column = @Column(name = "messageId", nullable = false, precision = 50, scale = 0)),
-            @AttributeOverride(name = "runId", column = @Column(name = "runId", nullable = false, precision = 50, scale = 0))})
+            @AttributeOverride(name = "messageId", column = @Column(name = "messageId", nullable = false, precision = 50, scale = 0))})
     public UserTweetId getId() {
         return id;
     }
@@ -69,13 +67,14 @@ public class UserTweet implements java.io.Serializable {
         this.creationDate = creationDate;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = TweetRun.class)
-    public Set<TweetRun> getTweetRuns() {
-        return tweetRuns;
+    public void setRun(Run run) {
+        this.run = run;
     }
 
-    public void setTweetRuns(Set<TweetRun> tweetRuns) {
-        this.tweetRuns = tweetRuns;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Run.class)
+    @JsonIgnore
+    public Run getRun() {
+        return run;
     }
 
     @Override

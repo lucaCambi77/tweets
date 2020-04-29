@@ -2,7 +2,7 @@ package org.cambi.test.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cambi.constant.Constant;
-import org.cambi.model.TweetRun;
+import org.cambi.dto.TweetDto;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ import java.util.List;
 public class StatusRun extends Constant {
 
 	@JsonProperty("statuses")
-	private List<TweetRun> tweets;
+	private List<TweetDto> tweets;
 
-	public List<TweetRun> getTweets() {
+	public List<TweetDto> getTweets() {
 		return tweets;
 	}
 }

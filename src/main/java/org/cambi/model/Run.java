@@ -32,7 +32,7 @@ public class Run implements java.io.Serializable {
 	private int numTweet;
 	private String api;
 	private String apiQuery;
-	private Set<UserTweet> tweetRuns = new HashSet<UserTweet>(0);
+	private Set<UserTweet> userTweets = new HashSet<UserTweet>(0);
 	private String exception;
 
 	@Id
@@ -93,12 +93,12 @@ public class Run implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = UserTweet.class)
-	public Set<UserTweet> getTweetRuns() {
-		return tweetRuns;
+	public Set<UserTweet> getUserTweets() {
+		return userTweets;
 	}
 
-	public void setTweetRuns(Set<UserTweet> tweetRuns) {
-		this.tweetRuns = tweetRuns;
+	public void setUserTweets(Set<UserTweet> userTweets) {
+		this.userTweets = userTweets;
 	}
 
 	@Column
@@ -108,26 +108,6 @@ public class Run implements java.io.Serializable {
 
 	public void setException(String exception) {
 		this.exception = exception;
-	}
-
-	public boolean equals(Object other) {
-		if ((this == other))
-			return true;
-		if ((other == null))
-			return false;
-		if (!(other instanceof Run))
-			return false;
-		Run castOther = (Run) other;
-
-		return ((this.getRunId() == castOther.getRunId()) || (this.getRunId() != null && castOther.getRunId() != null
-				&& this.getRunId().equals(castOther.getRunId())));
-	}
-
-	public int hashCode() {
-		int result = 17;
-
-		result = 37 * result + (getRunId() == null ? 0 : this.getRunId().hashCode());
-		return result;
 	}
 
 }

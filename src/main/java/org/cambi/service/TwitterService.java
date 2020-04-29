@@ -5,9 +5,13 @@ import org.cambi.constant.Constant;
 import org.cambi.dao.RunDao;
 import org.cambi.dao.TweetDao;
 import org.cambi.dao.UserTweetDao;
+import org.cambi.dto.RunDto;
+import org.cambi.dto.TweetDto;
+import org.cambi.dto.UserTweetDto;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
+import org.cambi.model.UserTweetId;
 import org.cambi.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -36,21 +41,21 @@ public class TwitterService extends Constant implements ITwitterService {
     @Autowired
     private UserTweetDao userDao;
 
-    public Run parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
+    public RunDto parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
             throws InterruptedException, ExecutionException {
         log.info("I am looking for tweets...");
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> future = executor.submit(runnable.setPath(path).setAuthenticator(httpRequestFactory));
 
-        Run run = new Run();
+        RunDto run = new RunDto();
         try {
             future.get(30, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
         } finally {
 
-            run.setTweetRuns(runnable.getTweets());
+            run.setTweets(runnable.getTweets());
             run.setException(runnable.getException());
         }
 
@@ -68,28 +73,46 @@ public class TwitterService extends Constant implements ITwitterService {
     public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
         Date start = new Date();
 
-        Run response = this.parseTweetsFrom(authorizedHttpRequestFactory,
+        RunDto response = this.parseTweetsFrom(authorizedHttpRequestFactory,
                 api.concat(query));
 
-        return this.createRun(response.getTweetRuns(), new Date().getTime() - start.getTime(), api, query);
-
+        return this.createRun(response, new Date().getTime() - start.getTime(), api, query);
     }
 
     @Transactional
-    public Run createRun(Set<TweetRun> tweetDto, Long elapse, String endPoint, String query) {
+    public Run createRun(RunDto runDto, Long elapse, String endPoint, String query) {
 
-        Run savedRun = runDao.saveRun(elapse, endPoint, query, tweetDto.size());
+        Map<Optional<UserTweetDto>, List<TweetDto>> tweetsSorted = getSortedTweetsMap(runDto.getTweets());
 
-        Map<Optional<UserTweet>, List<TweetRun>> tweetsSorted = getSortedTweetsMap(tweetDto);
+        Run savedRun = runDao.save(
+                Run.builder()
+                        .api(endPoint).
+                        apiQuery(query).
+                        ins(new Date()).
+                        numTweet(runDto.getTweets().size())
+                        .runTime(elapse)
+                        .build());
 
-        for (Map.Entry<Optional<UserTweet>, List<TweetRun>> listByUser : tweetsSorted.entrySet()) {
+        for (Map.Entry<Optional<UserTweetDto>, List<TweetDto>> listByUser : tweetsSorted.entrySet()) {
 
-            for (TweetRun tweet : listByUser.getValue()) {
+            for (TweetDto tweet : listByUser.getValue()) {
 
-                TweetRun savedTweet = tweetDao.saveTweets(tweet.getCreationDate(), tweet.getMessageText(), savedRun);
+                TweetRun tweetPost = TweetRun.builder()
+                        .creationDate(tweet.getCreationDate())
+                        .messageText(tweet.getMessageText())
+                        .messageId(tweet.getId())
+                        .build();
 
-                if (listByUser.getKey().isPresent())
-                    userDao.saveUserTweet(listByUser.getKey().get(), savedTweet);
+                tweetDao.save(tweetPost);
+
+                userDao.save(UserTweet.builder()
+                        .id(new UserTweetId(listByUser.getKey().isPresent() ? listByUser.getKey().get().getId() : new BigInteger("-1"), tweetPost))
+                        .userName(listByUser.getKey().isPresent() ? listByUser.getKey().get().getUserName() : "N.A")
+                        .userScreenName(listByUser.getKey().isPresent() ? listByUser.getKey().get().getUserScreenName() : "N.A")
+                        .creationDate(listByUser.getKey().isPresent() ? listByUser.getKey().get().getCreationDate() : new Date(0))
+                        .run(savedRun)
+                        .build());
+
             }
 
         }
@@ -97,7 +120,7 @@ public class TwitterService extends Constant implements ITwitterService {
         return savedRun;
     }
 
-    private Map<Optional<UserTweet>, List<TweetRun>> getSortedTweetsMap(Set<TweetRun> tweetDto) {
+    private Map<Optional<UserTweetDto>, List<TweetDto>> getSortedTweetsMap(Set<TweetDto> tweetDto) {
         return Utils.sortTweets(tweetDto);
     }
 

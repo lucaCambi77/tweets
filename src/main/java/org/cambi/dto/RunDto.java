@@ -3,22 +3,26 @@
  */
 package org.cambi.dto;
 
-import org.cambi.model.Run;
-import org.cambi.model.TweetRun;
-import org.cambi.model.UserTweet;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * @author luca
  *
  */
+@Getter
+@Setter
 public class RunDto {
 
-    private Run run;
-
-    private Map<Optional<UserTweet>, List<TweetRun>> userTweets;
-
+    private Long runId;
+    private Set<TweetDto> tweets;
+    private Date ins;
+    private long runTime;
+    private int numTweet;
+    private String api;
+    private String apiQuery;
+    private String exception;
 }

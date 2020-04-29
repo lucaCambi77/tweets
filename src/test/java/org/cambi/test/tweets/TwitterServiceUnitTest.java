@@ -5,6 +5,7 @@ import org.cambi.constant.Constant;
 import org.cambi.dao.RunDao;
 import org.cambi.dao.TweetDao;
 import org.cambi.dao.UserTweetDao;
+import org.cambi.dto.RunDto;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
@@ -28,7 +29,8 @@ import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
@@ -54,11 +56,11 @@ public class TwitterServiceUnitTest extends Constant {
 
     private static String search = "?track=bieber";
 
-    private static Run run;
+    private static RunDto run;
 
     static {
         try {
-            run = new ObjectMapper().readValue(new File("src/test/resources/run.json"), Run.class);
+            run = new ObjectMapper().readValue(new File("src/test/resources/run.json"), RunDto.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -73,11 +75,10 @@ public class TwitterServiceUnitTest extends Constant {
         Mockito.lenient().when(twitterService.parseTweetsFrom(any(), anyString()))
                 .thenReturn(run);
 
-        Mockito.lenient().when(runDao.saveRun(anyLong(), anyString(), anyString(), anyInt())).thenCallRealMethod();
-        Mockito.lenient().when(twitterDao.saveTweets(any(), any(), any())).thenCallRealMethod();
-        Mockito.lenient().when(userDao.saveUserTweet(any(), any())).thenCallRealMethod();
+        Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
+        Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
 
-        Mockito.lenient().when(runDao.save(run)).thenReturn(run);
+        Mockito.lenient().when(runDao.save(any())).thenReturn(new Run());
         Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
         Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
 
@@ -86,11 +87,11 @@ public class TwitterServiceUnitTest extends Constant {
     @Test
     public void should_parse_tweet_from_request() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        Run response = twitterService.parseTweetsFrom(authenticator.getAuthorizedHttpRequestFactory(),
+        RunDto response = twitterService.parseTweetsFrom(authenticator.getAuthorizedHttpRequestFactory(),
                 DEFAULT_API.concat(search));
 
         assertEquals(response.getRunId(), run.getRunId());
-        assertTrue(response.getTweetRuns().size() == 5);
+        assertTrue(response.getTweets().size() == 5);
 
     }
 
@@ -113,17 +114,16 @@ public class TwitterServiceUnitTest extends Constant {
     public void should_create_run() {
 
         Date elapse = new Date();
-        twitterServiceInject.createRun(run.getTweetRuns(), elapse.getTime(), DEFAULT_API, search);
-
-        Mockito.verify(runDao, Mockito.times(1)).saveRun(elapse.getTime(), DEFAULT_API, search, run.getTweetRuns().size());
+        twitterServiceInject.createRun(run, elapse.getTime(), DEFAULT_API, search);
 
         Mockito.verify(runDao, Mockito.times(1)).save(any());
 
-        Mockito.verify(twitterDao, Mockito.times(5)).saveTweets(any(), any(), any());
+        Mockito.verify(runDao, Mockito.times(1)).save(any());
+
+        Mockito.verify(twitterDao, Mockito.times(5)).save(any());
         Mockito.verify(twitterDao, Mockito.times(5)).save(any());
 
-        Mockito.verify(userDao, Mockito.times(3)).saveUserTweet(any(), any());
-        Mockito.verify(userDao, Mockito.times(3)).save(any());
+        Mockito.verify(userDao, Mockito.times(5)).save(any());
 
     }
 

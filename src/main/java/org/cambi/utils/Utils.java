@@ -3,8 +3,8 @@
  */
 package org.cambi.utils;
 
-import org.cambi.model.TweetRun;
-import org.cambi.model.UserTweet;
+import org.cambi.dto.TweetDto;
+import org.cambi.dto.UserTweetDto;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
  */
 public class Utils {
 
-    public static Map<Optional<UserTweet>, List<TweetRun>> sortTweets(Set<TweetRun> tweets) {
+    public static Map<Optional<UserTweetDto>, List<TweetDto>> sortTweets(Set<TweetDto> tweets) {
 
-        Map<Optional<UserTweet>, List<TweetRun>> tweetByUser = tweets.stream().sorted(new Comparator<TweetRun>() {
+        Map<Optional<UserTweetDto>, List<TweetDto>> tweetByUser = tweets.stream().sorted(new Comparator<TweetDto>() {
             @Override
-            public int compare(final TweetRun lhs, TweetRun rhs) {
+            public int compare(final TweetDto lhs, TweetDto rhs) {
                 long dateleft = lhs.getUserTweet() == null ? 0 : lhs.getUserTweet().getCreationDate().getTime();
                 long dateRight = rhs.getUserTweet() == null ? 0 : rhs.getUserTweet().getCreationDate().getTime();
 
@@ -27,10 +27,10 @@ public class Utils {
             }
         }).collect(Collectors.groupingBy(p -> Optional.ofNullable(p.getUserTweet())));
 
-        for (List<TweetRun> userTweetList : tweetByUser.values()) {
-            userTweetList.sort(new Comparator<TweetRun>() {
+        for (List<TweetDto> userTweetList : tweetByUser.values()) {
+            userTweetList.sort(new Comparator<TweetDto>() {
                 @Override
-                public int compare(final TweetRun lhs, TweetRun rhs) {
+                public int compare(final TweetDto lhs, TweetDto rhs) {
                     return Long.signum(lhs.getCreationDate().getTime() - rhs.getCreationDate().getTime());
                 }
             });

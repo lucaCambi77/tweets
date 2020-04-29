@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -76,8 +75,7 @@ public class TwitterIntegrationTest extends Constant {
         assertEquals(1, aRun.size());
         assertEquals(1, aRun.get(0).getRunId());
         assertEquals("?track=trump", aRun.get(0).getApiQuery());
-        assertEquals(1, aRun.get(0).getTweetRuns().size());
-        assertNotNull(aRun.get(0).getTweetRuns().iterator().next().getUserTweet().getId());
+        assertEquals(1, aRun.get(0).getUserTweets().size());
 
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         log.info(objectMapper.writeValueAsString(aRun.get(0)));
@@ -124,9 +122,7 @@ public class TwitterIntegrationTest extends Constant {
 
         assertEquals(1, findAllRun.size());
 
-        assertEquals(5, findAllRun.get(0).getTweetRuns().size());
-
-        assertEquals(3, findAllRun.get(0).getTweetRuns().stream().filter(t -> t.getUserTweet() != null).count());
+        assertEquals(3, findAllRun.get(0).getUserTweets().size());
 
     }
 }
