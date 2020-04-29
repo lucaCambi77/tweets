@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
  */
 public class Utils {
 
-    public static Map<Optional<UserTweetDto>, List<TweetDto>> sortTweets(Set<TweetDto> tweets) {
+    public static Map<UserTweetDto, List<TweetDto>> sortTweets(Set<TweetDto> tweets) {
 
-        Map<Optional<UserTweetDto>, List<TweetDto>> tweetByUser = tweets.stream().sorted(new Comparator<TweetDto>() {
+        Map<UserTweetDto, List<TweetDto>> tweetByUser = tweets.stream().sorted(new Comparator<TweetDto>() {
             @Override
             public int compare(final TweetDto lhs, TweetDto rhs) {
                 long dateleft = lhs.getUserTweet() == null ? 0 : lhs.getUserTweet().getCreationDate().getTime();
@@ -25,7 +25,7 @@ public class Utils {
 
                 return Long.signum(dateleft - dateRight);
             }
-        }).collect(Collectors.groupingBy(p -> Optional.ofNullable(p.getUserTweet())));
+        }).collect(Collectors.groupingBy(TweetDto::getUserTweet));
 
         for (List<TweetDto> userTweetList : tweetByUser.values()) {
             userTweetList.sort(new Comparator<TweetDto>() {
