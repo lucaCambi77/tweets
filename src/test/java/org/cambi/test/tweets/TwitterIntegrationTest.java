@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class, DbUnitTestExecutionListener.class})
 @DbUnitConfiguration(databaseConnection = {"dataSource"}, dataSetLoader = JsonDataSetLoader.class)
-// TODO Dbunit schema handling, @DatabaseTearDown not working
+// TODO Dbunit schema handling
 public class TwitterIntegrationTest extends Constant {
 
     private static final Logger log = LoggerFactory.getLogger(TwitterIntegrationTest.class);
@@ -75,7 +75,6 @@ public class TwitterIntegrationTest extends Constant {
     @DatabaseSetups({
             @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
             @DatabaseSetup(value = "classpath:sample.json", connection = "dataSource", type = DatabaseOperation.INSERT)
-
     })
     @Transactional(readOnly = true)
     public void should_match_database_status() throws Exception {
@@ -96,10 +95,7 @@ public class TwitterIntegrationTest extends Constant {
     }
 
     @Test
-    @DatabaseSetups({
-            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
-
-    })
+    @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
     public void should_create_run_from_api_call() throws JsonProcessingException {
         ResponseEntity<String> run = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
                 String.class);
