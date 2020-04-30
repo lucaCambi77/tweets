@@ -22,7 +22,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "messageId")
 public class TweetRun implements java.io.Serializable {
 
     private BigInteger messageId;
