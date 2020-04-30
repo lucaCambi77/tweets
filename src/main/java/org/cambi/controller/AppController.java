@@ -23,8 +23,6 @@ import java.util.concurrent.ExecutionException;
 @RestController
 public class AppController extends Constant {
 
-    private static final Logger log = LoggerFactory.getLogger(AppController.class);
-
     @Autowired
     private TwitterAuthenticator authenticator;
 
