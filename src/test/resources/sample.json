@@ -1,5 +1,5 @@
 {
-  "Run": [
+  "run": [
     {
       "runId": "1",
       "ins": "2020-01-01 12:00:00.0",
@@ -9,14 +9,14 @@
       "apiQuery": "?track=trump"
     }
   ],
-  "Tweet_Run": [
+  "tweet": [
     {
       "messageId": "1",
       "creationDate": "2020-01-01 12:00:00.0",
       "messageText": "This is a tweet"
     }
   ],
-  "USER_TWEET_RUN": [
+  "user_tweet": [
     {
       "userId": 1,
       "messageId": 1,

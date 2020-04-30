@@ -15,7 +15,7 @@ import java.util.Date;
  * @author luca
  */
 @Entity
-@Table(name = "USER_TWEET_RUN")
+@Table(name = "USER_TWEET")
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor

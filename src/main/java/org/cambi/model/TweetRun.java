@@ -18,7 +18,7 @@ import java.util.Set;
  * @author luca
  */
 @Entity
-@Table(name = "TWEET_RUN")
+@Table(name = "TWEET")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
