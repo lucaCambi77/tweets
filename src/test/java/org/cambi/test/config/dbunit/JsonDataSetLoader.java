@@ -17,7 +17,7 @@ public class JsonDataSetLoader extends AbstractDataSetLoader
     @Override
     protected IDataSet createDataSet(Resource resource) throws Exception
     {
-        return new JSONDataSet(resource.getInputStream());
+        return new JsonDataSet(resource.getInputStream());
     }
 
 }

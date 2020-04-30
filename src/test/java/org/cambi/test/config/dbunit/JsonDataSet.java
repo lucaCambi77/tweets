@@ -14,17 +14,17 @@ import java.util.List;
  * @author luca
  *
  */
-public class JSONDataSet extends AbstractDataSet {
+public class JsonDataSet extends AbstractDataSet {
 
-    private JSONITableParser tableParser = new JSONITableParser();
+    private JsonTableParser tableParser = new JsonTableParser();
 
     private List<DefaultTable> tables;
 
-    public JSONDataSet(File file) throws Exception {
+    public JsonDataSet(File file) throws Exception {
         tables = tableParser.getTablesFromInput(file);
     }
 
-    public JSONDataSet(InputStream is) throws IOException, DataSetException {
+    public JsonDataSet(InputStream is) throws IOException, DataSetException {
         tables = tableParser.getTablesFromInput(is);
     }
 

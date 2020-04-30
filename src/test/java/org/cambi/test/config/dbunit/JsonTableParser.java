@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class JSONITableParser {
+class JsonTableParser {
 
     private ObjectMapper mapper = new ObjectMapper();
 
