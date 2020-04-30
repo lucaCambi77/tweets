@@ -8,7 +8,10 @@ import org.cambi.dto.UserTweetDto;
 import org.cambi.model.UserTweet;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +25,7 @@ public class Utils {
                 .collect(Collectors.groupingBy(TweetDto::getUserTweet));
     }
 
-    public static LinkedHashMap<BigInteger, List<UserTweet>> groupByUserTweets(Set<UserTweet> userTweets) {
+    public static LinkedHashMap<BigInteger, List<UserTweet>> groupByUserTweets(List<UserTweet> userTweets) {
         return userTweets.stream()
                 .collect(Collectors.groupingBy(u -> u.getId().getUserId(), LinkedHashMap::new, Collectors.toList()));
 

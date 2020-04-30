@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author luca
@@ -20,6 +20,6 @@ import java.util.Set;
 @Component
 public interface UserTweetDao extends JpaRepository<UserTweet, UserTweetId> {
 
-    @Query("from UserTweet ut inner join Run r on ut.run.runId = r.runId where r.runId = :runId")
-    public Set<UserTweet> findByRun(@Param("runId") Long runId, Sort sort);
+    @Query(value = "from UserTweet where run.runId = :runId")
+    public List<UserTweet> findByRun(@Param("runId") Long runId, Sort sort);
 }

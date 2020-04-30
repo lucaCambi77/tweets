@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "USER_TWEET_RUN")
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")

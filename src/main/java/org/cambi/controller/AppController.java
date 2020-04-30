@@ -1,8 +1,6 @@
 package org.cambi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;
-import org.cambi.dao.RunDao;
 import org.cambi.model.Run;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
@@ -20,7 +18,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -34,21 +31,6 @@ public class AppController extends Constant {
     @Autowired
     private ITwitterService twitterService;
 
-    @Autowired
-    private RunDao runRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    /**
-     * @param api
-     * @param query
-     * @return
-     * @throws IOException
-     * @throws TwitterAuthenticationException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
     @GetMapping("/run")
     public LinkedHashMap<BigInteger, List<UserTweet>> run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
                                                           @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
@@ -57,7 +39,9 @@ public class AppController extends Constant {
         Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
                 api, query);
 
-        return Utils.groupByUserTweets(twitterService.findByRun(run.getRunId()));
+        List<UserTweet> userTweets = twitterService.findByRun(run.getRunId());
+
+        return Utils.groupByUserTweets(userTweets);
     }
 
     @GetMapping("/run/list")

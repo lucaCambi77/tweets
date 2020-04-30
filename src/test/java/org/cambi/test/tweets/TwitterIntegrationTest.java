@@ -17,6 +17,7 @@ import org.cambi.model.UserTweet;
 import org.cambi.service.ITwitterService;
 import org.cambi.test.config.ApplicationConfigurationTest;
 import org.cambi.test.config.dbunit.JsonDataSetLoader;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -35,11 +36,9 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -67,6 +66,11 @@ public class TwitterIntegrationTest extends Constant {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @BeforeEach
+    public void setUp() {
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
     @Test
     @DatabaseSetups({
             @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
@@ -82,7 +86,6 @@ public class TwitterIntegrationTest extends Constant {
         assertEquals("?track=trump", aRun.get(0).getApiQuery());
         assertEquals(1, aRun.get(0).getUserTweets().size());
 
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         log.info(objectMapper.writeValueAsString(aRun.get(0)));
     }
 
@@ -97,20 +100,7 @@ public class TwitterIntegrationTest extends Constant {
             @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
 
     })
-    public void should_create_run_from_api_call() {
-        ResponseEntity<String> entity = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
-                String.class);
-        log.info(entity.getBody());
-
-        assertEquals(HttpStatus.OK, entity.getStatusCode());
-    }
-
-    @Test
-    @DatabaseSetups({
-            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
-
-    })
-    public void should_find_runs_from_api_call() throws JsonProcessingException {
+    public void should_create_run_from_api_call() throws JsonProcessingException {
         ResponseEntity<String> run = restTemplate.getForEntity("http://localhost:" + this.port + "/run",
                 String.class);
         assertEquals(HttpStatus.OK, run.getStatusCode());
@@ -118,14 +108,14 @@ public class TwitterIntegrationTest extends Constant {
         LinkedHashMap<BigInteger, List<UserTweet>> list = objectMapper.readValue(run.getBody(), new TypeReference<LinkedHashMap<BigInteger, List<UserTweet>>>() {
         });
 
+        log.info(objectMapper.writeValueAsString(list));
+
         assertEquals(3, list.size());
 
         ResponseEntity<String> findAll = restTemplate.getForEntity("http://localhost:" + this.port + "/run/list",
                 String.class);
 
         assertEquals(HttpStatus.OK, findAll.getStatusCode());
-
-        log.info(findAll.getBody());
 
         List<Run> findAllRun = objectMapper.readValue(findAll.getBody(), new TypeReference<List<Run>>() {
         });

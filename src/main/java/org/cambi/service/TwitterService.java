@@ -73,7 +73,7 @@ public class TwitterService extends Constant implements ITwitterService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<UserTweet> findByRun(Long runId) {
+    public List<UserTweet> findByRun(Long runId) {
         return userDao.findByRun(runId, Sort.by(Sort.Order.asc("creationDate")
                 , Sort.Order.asc("id.messageId")));
     }
@@ -104,6 +104,13 @@ public class TwitterService extends Constant implements ITwitterService {
 
         for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweets.entrySet()) {
 
+            UserTweet user = UserTweet.builder()
+                    .userName(listByUser.getKey().getUserName())
+                    .userScreenName(listByUser.getKey().getUserScreenName())
+                    .creationDate(listByUser.getKey().getCreationDate())
+                    .run(savedRun)
+                    .build();
+
             for (TweetDto tweet : listByUser.getValue()) {
 
                 TweetRun tweetPost = TweetRun.builder()
@@ -114,13 +121,9 @@ public class TwitterService extends Constant implements ITwitterService {
 
                 tweetDao.save(tweetPost);
 
-                userDao.save(UserTweet.builder()
-                        .id(new UserTweetId(listByUser.getKey().getId(), tweetPost))
-                        .userName(listByUser.getKey().getUserName())
-                        .userScreenName(listByUser.getKey().getUserScreenName())
-                        .creationDate(listByUser.getKey().getCreationDate())
-                        .run(savedRun)
-                        .build());
+                userDao.save(
+                        user.toBuilder()
+                                .id(new UserTweetId(listByUser.getKey().getId(), tweetPost)).build());
 
             }
 
