@@ -1,6 +1,7 @@
 package org.cambi.model;
 // Generated Apr 10, 2018 11:58:47 AM by Hibernate Tools 3.6.0.Final
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -93,6 +94,7 @@ public class Run implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "run", targetEntity = UserTweet.class)
+	@JsonIgnore
 	public Set<UserTweet> getUserTweets() {
 		return userTweets;
 	}

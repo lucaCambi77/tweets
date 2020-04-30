@@ -23,7 +23,7 @@ public class TweetDto extends Constant {
 
     public UserTweetDto getUserTweet() {
         return userTweet == null ? UserTweetDto.builder()
-                .id(new BigInteger("-1"))
+                .id(new BigInteger("0"))
                 .userName("N.A")
                 .userScreenName("N.A")
                 .creationDate(new Date(0))

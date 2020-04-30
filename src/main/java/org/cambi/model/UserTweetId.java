@@ -1,7 +1,5 @@
 package org.cambi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
@@ -35,7 +33,6 @@ public class UserTweetId implements java.io.Serializable {
     }
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "messageId", nullable = false)
     public TweetRun getMessageId() {
         return messageId;

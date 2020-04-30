@@ -3,8 +3,7 @@
  */
 package org.cambi.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.Set;
@@ -15,6 +14,9 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class RunDto {
 
     private Long runId;
@@ -25,4 +27,5 @@ public class RunDto {
     private String api;
     private String apiQuery;
     private String exception;
+
 }
