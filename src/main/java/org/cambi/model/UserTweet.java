@@ -72,6 +72,7 @@ public class UserTweet implements java.io.Serializable {
     }
 
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = Run.class)
+    @JoinColumn(name = "runId", nullable = false)
     @JsonIgnore
     public Run getRun() {
         return run;
