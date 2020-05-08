@@ -3,6 +3,7 @@
  */
 package org.cambi.test.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
@@ -22,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import java.io.*;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -55,22 +58,14 @@ public class ApplicationConfigurationTest {
                     public LowLevelHttpResponse execute() throws IOException {
 
                         try {
-                            InputStream is = new FileInputStream("src/test/resources/tweets.json");
-                            BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 
-                            String line = buf.readLine();
+                            List<TweetDto> tweets = objectMapper
+                                    .readValue(new File("src/test/resources/tweets.json"), new TypeReference<List<TweetDto>>() {
+                                    });
+
                             StringBuilder sb = new StringBuilder();
 
-                            while (line != null) {
-                                sb.append(line).append("\n");
-                                line = buf.readLine();
-                            }
-                            buf.close();
-
-                            StatusRun status = objectMapper.readValue(sb.toString(), StatusRun.class);
-                            sb = new StringBuilder();
-
-                            for (TweetDto tweet : status.getTweets()) {
+                            for (TweetDto tweet : tweets) {
                                 sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
                             }
 
