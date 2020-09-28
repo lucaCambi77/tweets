@@ -2,57 +2,34 @@ package org.cambi.test.run;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseOperation;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DatabaseSetups;
-import com.github.springtestdbunit.annotation.DbUnitConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
 import org.cambi.service.ITwitterService;
 import org.cambi.utils.Utils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfigurationTest.class})
 @TestPropertySource(locations = "/test.properties")
 @ActiveProfiles("test")
-@TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
-        TransactionDbUnitTestExecutionListener.class, DbUnitTestExecutionListener.class})
-@DbUnitConfiguration(databaseConnection = {"dataSource"}, dataSetLoader = JsonDataSetLoader.class)
-// TODO Dbunit schema handling, @DatabaseTearDown not working
+@Slf4j
 public class TwitterIntegrationTest extends Constant {
-
-    private static final Logger log = LoggerFactory.getLogger(TwitterIntegrationTest.class);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -64,8 +41,7 @@ public class TwitterIntegrationTest extends Constant {
     private TwitterAuthenticator authenticator;
 
     @Test
-    @DatabaseSetup(type = DatabaseOperation.DELETE_ALL)
-    @Transactional()
+    @Transactional
     public void should_create_run_from_tweet_request()
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
@@ -87,16 +63,12 @@ public class TwitterIntegrationTest extends Constant {
 
         log.info("We have a new Run");
 
-        assertNotNull(run.getRunId());
+        assertEquals(1, twitterService.findAllRun().size());
     }
 
     @Test
-    @DatabaseSetups({
-            @DatabaseSetup(type = DatabaseOperation.DELETE_ALL),
-            @DatabaseSetup(value = "classpath:sample.json", connection = "dataSource", type = DatabaseOperation.INSERT)
-
-    })
-    @Transactional(readOnly = true)
+    @Sql({"/sample.sql"})
+    @Transactional
     public void should_match_database_status() throws Exception {
         List<Run> aRun = twitterService.findAllRun();
 
