@@ -5,7 +5,7 @@ package org.cambi.application;
 
 import org.cambi.constant.Constant;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.TwitterServiceRunnable;
+import org.cambi.service.TwitterParserRunnableService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class AppConfiguration extends Constant {
 
 	@Bean
 	@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	public TwitterServiceRunnable getTwitterServiceRunnable() {
-		return new TwitterServiceRunnable();
+	public TwitterParserRunnableService getTwitterServiceRunnable() {
+		return new TwitterParserRunnableService();
 	}
 }

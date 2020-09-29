@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class TwitterParserService {
 
-    private TwitterServiceRunnable runnable;
+    private TwitterParserRunnableService runnable;
 
     public RunDto parseTweetsFrom(String path)
             throws InterruptedException, ExecutionException {

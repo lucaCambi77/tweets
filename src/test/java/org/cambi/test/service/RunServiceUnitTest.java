@@ -14,7 +14,7 @@ import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.service.RunService;
 import org.cambi.service.TwitterParserService;
-import org.cambi.service.TwitterServiceRunnable;
+import org.cambi.service.TwitterParserRunnableService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,14 +60,14 @@ public class RunServiceUnitTest extends Constant {
     private TwitterParserService twitterParserService;
 
     @Mock
-    private TwitterServiceRunnable twitterServiceRunnable;
+    private TwitterParserRunnableService twitterParserRunnableService;
 
     private static String search = "?track=bieber";
 
     @BeforeEach
     public void setUp() throws ExecutionException, InterruptedException {
 
-        Mockito.lenient().when(twitterServiceRunnable.getTweets())
+        Mockito.lenient().when(twitterParserRunnableService.getTweets())
                 .thenAnswer((Answer<Set<TweetDto>>) invocation -> new HashSet<>(
                         Arrays.asList(TweetDto.builder().build())
                 ));

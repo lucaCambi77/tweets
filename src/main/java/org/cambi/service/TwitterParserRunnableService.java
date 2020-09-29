@@ -23,7 +23,7 @@ import java.util.Set;
  */
 @Service
 @Slf4j
-public class TwitterServiceRunnable implements Runnable {
+public class TwitterParserRunnableService implements Runnable {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -35,17 +35,11 @@ public class TwitterServiceRunnable implements Runnable {
 
     private Set<TweetDto> tweets;
 
-    /**
-     *
-     */
-    public TwitterServiceRunnable() {
+    public TwitterParserRunnableService() {
 
     }
 
-    /**
-     * Max number of tweets
-     */
-    private static int MAX_TWEET_SIZE = 100;
+    private static int MAX_NUM_TWEETS = 100;
 
     @Override
     public void run() {
@@ -65,7 +59,7 @@ public class TwitterServiceRunnable implements Runnable {
              */
             while (line != null && !Thread.interrupted()) {
 
-                if (countTweets == MAX_TWEET_SIZE)
+                if (countTweets == MAX_NUM_TWEETS)
                     break;
 
                 tweets.add(objectMapper.readValue(line, TweetDto.class));
