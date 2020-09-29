@@ -1,30 +1,25 @@
 package org.cambi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
+import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.repository.RunRepository;
 import org.cambi.service.ITwitterService;
 import org.cambi.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Date;
+import java.math.BigInteger;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
 public class AppController extends Constant {
-
-    private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
     @Autowired
     private TwitterAuthenticator authenticator;
@@ -32,35 +27,22 @@ public class AppController extends Constant {
     @Autowired
     private ITwitterService twitterService;
 
-    @Autowired
-    private RunRepository runRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    /**
-     * @param api
-     * @param query
-     * @return
-     * @throws IOException
-     * @throws TwitterAuthenticationException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     */
     @GetMapping("/run")
-    public String run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
-                      @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
+    public LinkedHashMap<BigInteger, List<UserTweet>> run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
+                                                          @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
         Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
                 api, query);
 
-        return objectMapper.writeValueAsString(Utils.sortTweets(run.getTweetRuns()));
+        List<UserTweet> userTweets = twitterService.findUserTweetsByRun(run.getRunId());
+
+        return Utils.groupByUserTweets(userTweets);
     }
 
     @GetMapping("/run/list")
-    public String runList() throws IOException {
-        return objectMapper.writeValueAsString(twitterService.findAllRun());
+    public List<Run> runList() throws IOException {
+        return twitterService.findAllRun();
     }
 
     @GetMapping("/")

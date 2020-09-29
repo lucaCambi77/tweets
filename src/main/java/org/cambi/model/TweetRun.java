@@ -1,10 +1,16 @@
 package org.cambi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
-
-import static javax.persistence.GenerationType.SEQUENCE;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Serialize class for readed tweets.
@@ -12,41 +18,26 @@ import static javax.persistence.GenerationType.SEQUENCE;
  * @author luca
  */
 @Entity
-@Table(name = "TWEET_RUN")
+@Table(name = "TWEET")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "messageId")
 public class TweetRun implements java.io.Serializable {
 
-    private BigInteger id;
-    private Run run;
+    private BigInteger messageId;
     private Date creationDate;
     private String messageText;
-    private UserTweet userTweet;
-
-    public TweetRun() {
-    }
-
-    public TweetRun(BigInteger id) {
-        this.id = id;
-    }
+    private Set<UserTweet> userTweets = new HashSet<>(0);
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "messagegenerator")
     @Column(nullable = false, precision = 50, scale = 0)
-    public BigInteger getId() {
-        return id;
+    public BigInteger getMessageId() {
+        return messageId;
     }
 
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, insertable = true, updatable = false, name = "runId")
-    public Run getRun() {
-        return run;
-    }
-
-    public void setRun(Run run) {
-        this.run = run;
+    public void setMessageId(BigInteger messageId) {
+        this.messageId = messageId;
     }
 
     public void setCreationDate(Date creationDate) {
@@ -67,17 +58,18 @@ public class TweetRun implements java.io.Serializable {
         return messageText;
     }
 
-    @OneToOne(mappedBy = "tweetRuns", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    public UserTweet getUserTweet() {
-        return userTweet;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.messageId")
+    @JsonIgnore
+    public Set<UserTweet> getUserTweets() {
+        return userTweets;
     }
 
-    public void setUserTweet(UserTweet userTweets) {
-        this.userTweet = userTweets;
+    public void setUserTweets(Set<UserTweet> userTweets) {
+        this.userTweets = userTweets;
     }
 
     @Override
     public String toString() {
-        return "Tweet: [ messageId : " + getId() + ",created at : " + creationDate + ", text : " + messageText + "]";
+        return "Tweet: [ messageId : " + getMessageId() + ",created at : " + creationDate + ", text : " + messageText + "]";
     }
 }

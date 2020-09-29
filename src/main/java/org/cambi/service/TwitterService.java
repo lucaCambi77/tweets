@@ -2,13 +2,17 @@ package org.cambi.service;
 
 import com.google.api.client.http.HttpRequestFactory;
 import org.cambi.constant.Constant;
+import org.cambi.dao.RunDao;
+import org.cambi.dao.TweetDao;
+import org.cambi.dao.UserTweetDao;
+import org.cambi.dto.RunDto;
+import org.cambi.dto.TweetDto;
+import org.cambi.dto.UserTweetDto;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.model.UserTweetId;
-import org.cambi.repository.RunRepository;
-import org.cambi.repository.TweetRepository;
-import org.cambi.repository.UserRepository;
+import org.cambi.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -30,31 +35,29 @@ public class TwitterService extends Constant implements ITwitterService {
     private TwitterServiceRunnable runnable;
 
     @Autowired
-    private TweetRepository twitterRepository;
+    private TweetDao tweetDao;
 
     @Autowired
-    private RunRepository runRepository;
+    private RunDao runDao;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserTweetDao userDao;
 
-    public Run parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
+    public RunDto parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
             throws InterruptedException, ExecutionException {
         log.info("I am looking for tweets...");
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> future = executor.submit(runnable.setPath(path).setAuthenticator(httpRequestFactory));
 
-        Run run = new Run();
+        RunDto run = new RunDto();
         try {
             future.get(30, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
         } finally {
 
-            Set<TweetRun> tweets = runnable.getTweets();
-
-            run.setTweetRuns(tweets);
+            run.setTweets(runnable.getTweets());
             run.setException(runnable.getException());
         }
 
@@ -65,64 +68,68 @@ public class TwitterService extends Constant implements ITwitterService {
     @Override
     @Transactional(readOnly = true)
     public List<Run> findAllRun() {
-        return runRepository.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
+        return runDao.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserTweet> findUserTweetsByRun(Long runId) {
+        return userDao.findByRun(runId, Sort.by(Sort.Order.asc("creationDate")
+                , Sort.Order.asc("id.messageId")));
     }
 
     @Override
     public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
         Date start = new Date();
 
-        Run response = this.parseTweetsFrom(authorizedHttpRequestFactory,
+        RunDto response = this.parseTweetsFrom(authorizedHttpRequestFactory,
                 api.concat(query));
 
-        return this.createRun(response, new Date().getTime() - start.getTime(), api, query);
-
+        return this.createRun(response.getTweets(), new Date().getTime() - start.getTime(), api, query);
     }
 
     @Transactional
-    public Run createRun(Run runDto, Long elapse, String endPoint, String query) {
+    public Run createRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
 
-        Set<TweetRun> tweetDto = runDto.getTweetRuns();
-        /**
-         * New Run
-         */
-        Run newRun = new Run();
+        Map<UserTweetDto, List<TweetDto>> tweets = Utils.tweetsToUserTweet(tweetDto);
 
-        newRun.setApi(endPoint);
-        newRun.setApiQuery(query);
-        newRun.setIns(new Date());
-        newRun.setNumTweet(tweetDto.size());
-        newRun.setRunTime(elapse);
-        newRun.setException(runDto.getException());
+        Run savedRun = runDao.save(
+                Run.builder()
+                        .api(endPoint).
+                        apiQuery(query).
+                        ins(new Date()).
+                        numTweet(tweetDto.size())
+                        .runTime(elapse)
+                        .build());
 
-        Run savedRun = runRepository.save(newRun);
+        for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweets.entrySet()) {
 
-        for (TweetRun tweetRun : tweetDto) {
-            TweetRun savedTweet = saveTweets(tweetRun, savedRun);
-            saveTweet(tweetRun, savedTweet);
+            UserTweet user = UserTweet.builder()
+                    .userName(listByUser.getKey().getUserName())
+                    .userScreenName(listByUser.getKey().getUserScreenName())
+                    .creationDate(listByUser.getKey().getCreationDate())
+                    .run(savedRun)
+                    .build();
+
+            for (TweetDto tweet : listByUser.getValue()) {
+
+                TweetRun tweetPost = TweetRun.builder()
+                        .creationDate(tweet.getCreationDate())
+                        .messageText(tweet.getMessageText())
+                        .messageId(tweet.getId())
+                        .build();
+
+                tweetDao.save(tweetPost);
+
+                userDao.save(
+                        user.toBuilder()
+                                .id(new UserTweetId(listByUser.getKey().getId(), tweetPost)).build());
+
+            }
+
         }
 
         return savedRun;
     }
 
-    public void saveTweet(TweetRun tweetRun, TweetRun savedTweet) {
-        if (null != tweetRun.getUserTweet()) {
-            UserTweet user = new UserTweet();
-            user.setTweetRuns(savedTweet);
-            user.setCreationDate(tweetRun.getUserTweet().getCreationDate());
-            user.setUserName(tweetRun.getUserTweet().getUserName());
-            user.setUserScreenName(tweetRun.getUserTweet().getUserScreenName());
-            user.setId(new UserTweetId(tweetRun.getUserTweet().getId().getUserId(), savedTweet.getId()));
-        }
-    }
-
-    public TweetRun saveTweets(TweetRun aTweet, Run savedRun) {
-
-        TweetRun tweetRun = new TweetRun();
-        tweetRun.setCreationDate(aTweet.getCreationDate());
-        tweetRun.setMessageText(aTweet.getMessageText());
-        tweetRun.setRun(savedRun);
-
-        return twitterRepository.save(tweetRun);
-    }
 }
