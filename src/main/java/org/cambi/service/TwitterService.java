@@ -1,6 +1,7 @@
 package org.cambi.service;
 
-import com.google.api.client.http.HttpRequestFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.cambi.constant.Constant;
 import org.cambi.dao.RunDao;
 import org.cambi.dao.TweetDao;
@@ -13,9 +14,6 @@ import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.model.UserTweetId;
 import org.cambi.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,63 +22,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class TwitterService extends Constant {
 
-    private static final Logger log = LoggerFactory.getLogger(TwitterService.class);
-
-    @Autowired
-    private TwitterServiceRunnable runnable;
-
-    @Autowired
+    private TwitterParserService twitterParserService;
     private TweetDao tweetDao;
-
-    @Autowired
     private RunDao runDao;
-
-    @Autowired
     private UserTweetDao userDao;
-
-    public RunDto parseTweetsFrom(HttpRequestFactory httpRequestFactory, String path)
-            throws InterruptedException, ExecutionException {
-        log.info("I am looking for tweets...");
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<?> future = executor.submit(runnable.setPath(path).setAuthenticator(httpRequestFactory));
-
-        RunDto run = new RunDto();
-        try {
-            future.get(30, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
-        } finally {
-
-            run.setTweets(runnable.getTweets());
-            run.setException(runnable.getException());
-        }
-
-        executor.shutdownNow();
-        return run;
-    }
 
     @Transactional(readOnly = true)
     public List<Run> findAllRun() {
         return runDao.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
     }
 
-    public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
+    @Transactional
+    public Run createRun(String api, String query) throws ExecutionException, InterruptedException {
         Date start = new Date();
 
-        RunDto response = this.parseTweetsFrom(authorizedHttpRequestFactory,
-                api.concat(query));
+        RunDto response = twitterParserService.parseTweetsFrom(api.concat(query));
 
-        return this.createRun(response.getTweets(), new Date().getTime() - start.getTime(), api, query);
+        return createRun(response.getTweets(), new Date().getTime() - start.getTime(), api, query);
     }
 
     @Transactional
-    public Run createRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
+    private Run createRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
 
         Map<UserTweetDto, List<TweetDto>> tweets = Utils.tweetsToUserTweet(tweetDto);
 

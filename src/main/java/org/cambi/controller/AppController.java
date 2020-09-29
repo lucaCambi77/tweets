@@ -36,9 +36,7 @@ public class AppController extends Constant {
                    @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        return twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
-                api, query);
-
+        return twitterService.createRun(api, query);
     }
 
     @GetMapping("/userTweets")

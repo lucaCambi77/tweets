@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -23,7 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Matchers.any;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
@@ -45,13 +47,6 @@ public class TwitterDaoUnitTest extends Constant {
     private static TweetRun tweets;
 
     static {
-
-        tweets = TweetRun.builder()
-                .messageId(new BigInteger("1"))
-                .creationDate(new Date())
-                .messageText("This is a tweet")
-                .build();
-
         run =
                 Run.builder()
                         .runId(1L)
@@ -61,6 +56,12 @@ public class TwitterDaoUnitTest extends Constant {
                         numTweet(1)
                         .runTime(10)
                         .build();
+
+        tweets = TweetRun.builder()
+                .messageId(new BigInteger("1"))
+                .creationDate(new Date())
+                .messageText("This is a tweet")
+                .build();
 
         userTweets = UserTweet.builder()
                 .id(new UserTweetId(new BigInteger("1"), tweets))
@@ -76,7 +77,7 @@ public class TwitterDaoUnitTest extends Constant {
         Mockito.lenient().when(runDao.findAll()).thenReturn(Arrays.asList(run));
         Mockito.lenient().when(twitterDao.findAll()).thenReturn(Arrays.asList(tweets));
         Mockito.lenient().when(userDao.findAll()).thenReturn(Arrays.asList(userTweets));
-
+        Mockito.lenient().when(userDao.findByRun(anyLong(), any())).thenReturn(Arrays.asList(userTweets));
     }
 
     @Test
@@ -84,16 +85,24 @@ public class TwitterDaoUnitTest extends Constant {
 
         List<Run> runs = runDao.findAll();
         assertEquals(1, runs.size());
-        assertNotNull(runs.get(0).getRunId());
+        assertEquals(run.getRunId(), runs.get(0).getRunId());
 
         List<TweetRun> tweets = twitterDao.findAll();
         assertEquals(1, tweets.size());
-        assertNotNull(tweets.get(0).getMessageId());
+        assertEquals(this.tweets.getMessageId(), tweets.get(0).getMessageId());
 
         List<UserTweet> users = userDao.findAll();
         assertEquals(1, users.size());
-        assertNotNull(users.get(0).getId().getUserId());
-        assertNotNull(users.get(0).getId().getMessageId());
+        assertEquals(this.userTweets.getId().getUserId(), users.get(0).getId().getUserId());
+        assertEquals(this.userTweets.getId().getMessageId(), users.get(0).getId().getMessageId());
     }
 
+    @Test
+    public void should_match_userTweets_by_run() {
+
+        List<UserTweet> users = userDao.findByRun(run.getRunId(), Sort.by(Sort.Order.asc("column")));
+        assertEquals(1, users.size());
+        assertEquals(userTweets.getId().getUserId(), users.get(0).getId().getUserId());
+        assertEquals(userTweets.getId().getMessageId(), users.get(0).getId().getMessageId());
+    }
 }

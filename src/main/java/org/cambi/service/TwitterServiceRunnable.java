@@ -5,10 +5,9 @@ package org.cambi.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequestFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.cambi.dto.TweetDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +22,18 @@ import java.util.Set;
  *
  */
 @Service
+@Slf4j
 public class TwitterServiceRunnable implements Runnable {
-
-    private static final Logger log = LoggerFactory.getLogger(TwitterServiceRunnable.class);
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private HttpRequestFactory authenticator;
+    @Autowired
+    private TwitterAuthenticator authenticator;
 
     private String path;
 
     private Set<TweetDto> tweets;
-    private String exception;
 
     /**
      *
@@ -51,10 +49,11 @@ public class TwitterServiceRunnable implements Runnable {
 
     @Override
     public void run() {
-        tweets = new HashSet<TweetDto>();
+        tweets = new HashSet<>();
 
         try {
-            InputStream in = getAuthenticator().buildGetRequest(new GenericUrl(getPath())).execute().getContent();
+            InputStream in = authenticator.getAuthorizedHttpRequestFactory()
+                    .buildGetRequest(new GenericUrl(path)).execute().getContent();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line = reader.readLine();
@@ -72,8 +71,9 @@ public class TwitterServiceRunnable implements Runnable {
                 tweets.add(objectMapper.readValue(line, TweetDto.class));
 
                 line = reader.readLine();
+                ++countTweets;
 
-                log.info("Number of Tweets: " + (++countTweets));
+                log.info("Number of Tweets: " + countTweets);
             }
 
         } catch (Exception e) {
@@ -83,31 +83,11 @@ public class TwitterServiceRunnable implements Runnable {
 
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public TwitterServiceRunnable setPath(String path) {
+    public void setPath(String path) {
         this.path = path;
-
-        return this;
-    }
-
-    public HttpRequestFactory getAuthenticator() {
-        return authenticator;
-    }
-
-    public TwitterServiceRunnable setAuthenticator(HttpRequestFactory authenticator) {
-        this.authenticator = authenticator;
-        return this;
     }
 
     public Set<TweetDto> getTweets() {
         return tweets;
     }
-
-    public String getException() {
-        return exception;
-    }
-
 }

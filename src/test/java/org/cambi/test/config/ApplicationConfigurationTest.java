@@ -5,16 +5,10 @@ package org.cambi.test.config;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.LowLevelHttpRequest;
-import com.google.api.client.http.LowLevelHttpResponse;
-import com.google.api.client.json.Json;
-import com.google.api.client.testing.http.MockHttpTransport;
-import com.google.api.client.testing.http.MockLowLevelHttpRequest;
-import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import org.cambi.dto.TweetDto;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
+import org.cambi.test.Utils;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +18,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -45,44 +40,11 @@ public class ApplicationConfigurationTest {
     public TwitterAuthenticator getTwitterAuthenticator() throws TwitterAuthenticationException, IOException {
         MockitoAnnotations.initMocks(this);
 
-        /**
-         * We read tweets from a file to create a fake request
-         *
-         * Mocking google Transport
-         */
-        HttpTransport transport = new MockHttpTransport() {
-            @Override
-            public LowLevelHttpRequest buildRequest(String method, String url) {
-                return new MockLowLevelHttpRequest() {
-                    @Override
-                    public LowLevelHttpResponse execute() throws IOException {
+        List<TweetDto> tweets = objectMapper
+                .readValue(new File("src/test/resources/tweets.json"), new TypeReference<List<TweetDto>>() {
+                });
 
-                        try {
-
-                            List<TweetDto> tweets = objectMapper
-                                    .readValue(new File("src/test/resources/tweets.json"), new TypeReference<List<TweetDto>>() {
-                                    });
-
-                            StringBuilder sb = new StringBuilder();
-
-                            for (TweetDto tweet : tweets) {
-                                sb.append(objectMapper.writeValueAsString(tweet)).append("\n");
-                            }
-
-                            MockLowLevelHttpResponse response = new MockLowLevelHttpResponse();
-                            response.setStatusCode(200);
-                            response.setContentType(Json.MEDIA_TYPE);
-                            response.setContent(sb.toString());
-                            return response;
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                };
-            }
-        };
-
-        when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(transport.createRequestFactory());
+        when(authenticator.getAuthorizedHttpRequestFactory()).thenReturn(Utils.getFakeRequestFactory(new HashSet<>(tweets)));
         return authenticator;
     }
 

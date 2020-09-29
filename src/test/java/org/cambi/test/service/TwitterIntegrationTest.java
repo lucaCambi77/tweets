@@ -47,7 +47,7 @@ public class TwitterIntegrationTest extends Constant {
     @Transactional
     public void should_create_run_from_tweet_request() throws IOException, TwitterAuthenticationException, ExecutionException, InterruptedException {
 
-        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(), DEFAULT_API, "query");
+        Run run = twitterService.createRun(DEFAULT_API, "query");
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         log.info(" **** ***   **   *** **** **** **** ");
