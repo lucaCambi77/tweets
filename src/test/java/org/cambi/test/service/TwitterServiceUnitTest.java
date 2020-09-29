@@ -1,4 +1,4 @@
-package org.cambi.test.tweets;
+package org.cambi.test.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cambi.constant.Constant;

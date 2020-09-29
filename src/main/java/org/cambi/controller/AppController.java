@@ -5,7 +5,8 @@ import org.cambi.model.Run;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.ITwitterService;
+import org.cambi.service.TwitterService;
+import org.cambi.service.UserTweetsService;
 import org.cambi.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,29 +26,37 @@ public class AppController extends Constant {
     private TwitterAuthenticator authenticator;
 
     @Autowired
-    private ITwitterService twitterService;
+    private TwitterService twitterService;
+
+    @Autowired
+    private UserTweetsService userTweetsService;
 
     @GetMapping("/run")
-    public LinkedHashMap<BigInteger, List<UserTweet>> run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
-                                                          @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
+    public Run run(@RequestParam(name = "api", required = false, defaultValue = DEFAULT_API) String api,
+                   @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        Run run = twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
+        return twitterService.createRun(authenticator.getAuthorizedHttpRequestFactory(),
                 api, query);
 
-        List<UserTweet> userTweets = twitterService.findUserTweetsByRun(run.getRunId());
+    }
+
+    @GetMapping("/userTweets")
+    public LinkedHashMap<BigInteger, List<UserTweet>> userTweetsByRun(@RequestParam(name = "runId") Long runId) {
+
+        List<UserTweet> userTweets = userTweetsService.findUserTweetsByRun(runId);
 
         return Utils.groupByUserTweets(userTweets);
     }
 
     @GetMapping("/run/list")
-    public List<Run> runList() throws IOException {
+    public List<Run> runList() {
         return twitterService.findAllRun();
     }
 
     @GetMapping("/")
-    public String home() {
-        return "Hello World";
+    public String health() {
+        return "I am running";
     }
 
 }

@@ -1,4 +1,4 @@
-package org.cambi.test.tweets;
+package org.cambi.test.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -8,7 +8,8 @@ import org.cambi.constant.Constant;
 import org.cambi.model.Run;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.ITwitterService;
+import org.cambi.service.TwitterService;
+import org.cambi.service.UserTweetsService;
 import org.cambi.test.config.ApplicationConfigurationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,10 @@ public class TwitterIntegrationTest extends Constant {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ITwitterService twitterService;
+    private TwitterService twitterService;
+
+    @Autowired
+    private UserTweetsService userTweetsService;
 
     @Autowired
     private TwitterAuthenticator authenticator;
@@ -59,7 +63,7 @@ public class TwitterIntegrationTest extends Constant {
         log.info("We have a new Run");
 
         assertEquals(1, twitterService.findAllRun().size());
-        assertEquals(5, twitterService.findUserTweetsByRun(twitterService.findAllRun().get(0).getRunId()).size());
+        assertEquals(5, userTweetsService.findUserTweetsByRun(twitterService.findAllRun().get(0).getRunId()).size());
     }
 
     @Test

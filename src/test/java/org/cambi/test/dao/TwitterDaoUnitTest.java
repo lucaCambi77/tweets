@@ -1,4 +1,4 @@
-package org.cambi.test.tweets;
+package org.cambi.test.dao;
 
 import org.cambi.constant.Constant;
 import org.cambi.dao.RunDao;

@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 
 @Service
-public class TwitterService extends Constant implements ITwitterService {
+public class TwitterService extends Constant {
 
     private static final Logger log = LoggerFactory.getLogger(TwitterService.class);
 
@@ -65,20 +65,11 @@ public class TwitterService extends Constant implements ITwitterService {
         return run;
     }
 
-    @Override
     @Transactional(readOnly = true)
     public List<Run> findAllRun() {
         return runDao.findAll(Sort.by(Sort.Direction.DESC, "runTime"));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserTweet> findUserTweetsByRun(Long runId) {
-        return userDao.findByRun(runId, Sort.by(Sort.Order.asc("creationDate")
-                , Sort.Order.asc("id.messageId")));
-    }
-
-    @Override
     public Run createRun(HttpRequestFactory authorizedHttpRequestFactory, String api, String query) throws ExecutionException, InterruptedException {
         Date start = new Date();
 
@@ -102,6 +93,12 @@ public class TwitterService extends Constant implements ITwitterService {
                         .runTime(elapse)
                         .build());
 
+        createUserTweets(tweets, savedRun);
+
+        return savedRun;
+    }
+
+    private void createUserTweets(Map<UserTweetDto, List<TweetDto>> tweets, Run savedRun) {
         for (Map.Entry<UserTweetDto, List<TweetDto>> listByUser : tweets.entrySet()) {
 
             UserTweet user = UserTweet.builder()
@@ -126,10 +123,7 @@ public class TwitterService extends Constant implements ITwitterService {
                                 .id(new UserTweetId(listByUser.getKey().getId(), tweetPost)).build());
 
             }
-
         }
-
-        return savedRun;
     }
 
 }
