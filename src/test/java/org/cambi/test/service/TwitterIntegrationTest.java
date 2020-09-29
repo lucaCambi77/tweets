@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.cambi.application.Application;
 import org.cambi.constant.Constant;
 import org.cambi.model.Run;
-import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.TwitterService;
+import org.cambi.service.RunService;
 import org.cambi.service.UserTweetsService;
 import org.cambi.test.config.ApplicationConfigurationTest;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ public class TwitterIntegrationTest extends Constant {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private TwitterService twitterService;
+    private RunService runService;
 
     @Autowired
     private UserTweetsService userTweetsService;
@@ -45,9 +44,9 @@ public class TwitterIntegrationTest extends Constant {
 
     @Test
     @Transactional
-    public void should_create_run_from_tweet_request() throws IOException, TwitterAuthenticationException, ExecutionException, InterruptedException {
+    public void should_create_run_from_tweet_request() throws IOException, ExecutionException, InterruptedException {
 
-        Run run = twitterService.createRun(DEFAULT_API, "query");
+        Run run = runService.createRun(DEFAULT_API, "query");
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         log.info(" **** ***   **   *** **** **** **** ");
@@ -62,15 +61,15 @@ public class TwitterIntegrationTest extends Constant {
 
         log.info("We have a new Run");
 
-        assertEquals(1, twitterService.findAllRun().size());
-        assertEquals(5, userTweetsService.findUserTweetsByRun(twitterService.findAllRun().get(0).getRunId()).size());
+        assertEquals(1, runService.findAllRun().size());
+        assertEquals(5, userTweetsService.findUserTweetsByRun(runService.findAllRun().get(0).getRunId()).size());
     }
 
     @Test
     @Sql({"/sample.sql"})
     @Transactional(readOnly = true)
     public void should_match_database_status() throws Exception {
-        List<Run> aRun = twitterService.findAllRun();
+        List<Run> aRun = runService.findAllRun();
 
         assertEquals(1, aRun.size());
         assertEquals(1, aRun.get(0).getRunId());

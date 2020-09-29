@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TwitterService extends Constant {
+public class RunService extends Constant {
 
     private TwitterParserService twitterParserService;
     private TweetDao tweetDao;
@@ -48,12 +48,19 @@ public class TwitterService extends Constant {
         return createRun(response.getTweets(), new Date().getTime() - start.getTime(), api, query);
     }
 
-    @Transactional
     private Run createRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
 
         Map<UserTweetDto, List<TweetDto>> tweets = Utils.tweetsToUserTweet(tweetDto);
 
-        Run savedRun = runDao.save(
+        Run savedRun = saveRun(tweetDto, elapse, endPoint, query);
+
+        createUserTweets(tweets, savedRun);
+
+        return savedRun;
+    }
+
+    private Run saveRun(Set<TweetDto> tweetDto, Long elapse, String endPoint, String query) {
+        return runDao.save(
                 Run.builder()
                         .api(endPoint).
                         apiQuery(query).
@@ -61,10 +68,6 @@ public class TwitterService extends Constant {
                         numTweet(tweetDto.size())
                         .runTime(elapse)
                         .build());
-
-        createUserTweets(tweets, savedRun);
-
-        return savedRun;
     }
 
     private void createUserTweets(Map<UserTweetDto, List<TweetDto>> tweets, Run savedRun) {

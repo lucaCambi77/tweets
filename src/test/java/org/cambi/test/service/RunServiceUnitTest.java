@@ -12,8 +12,8 @@ import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
+import org.cambi.service.RunService;
 import org.cambi.service.TwitterParserService;
-import org.cambi.service.TwitterService;
 import org.cambi.service.TwitterServiceRunnable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,10 +39,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
-public class TwitterServiceUnitTest extends Constant {
+public class RunServiceUnitTest extends Constant {
 
     @InjectMocks
-    private TwitterService twitterService;
+    private RunService runService;
 
     @Mock
     private TwitterAuthenticator authenticator;
@@ -104,7 +104,7 @@ public class TwitterServiceUnitTest extends Constant {
     @Test
     public void should_parse_tweets_while_creating_run() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        twitterService.createRun(DEFAULT_API, search);
+        runService.createRun(DEFAULT_API, search);
 
         Mockito.verify(twitterParserService
                 , Mockito.times(1)).parseTweetsFrom(DEFAULT_API.concat(search));
@@ -113,7 +113,7 @@ public class TwitterServiceUnitTest extends Constant {
     @Test
     public void should_create_run() throws ExecutionException, InterruptedException {
 
-        twitterService.createRun(DEFAULT_API, search);
+        runService.createRun(DEFAULT_API, search);
 
         Mockito.verify(runDao, Mockito.times(1)).save(any());
 
