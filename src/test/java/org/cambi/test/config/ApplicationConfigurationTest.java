@@ -15,10 +15,8 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import org.cambi.dto.TweetDto;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +35,6 @@ import static org.mockito.Mockito.when;
 @Configuration
 @Profile("test")
 public class ApplicationConfigurationTest {
-
     @Mock
     private TwitterAuthenticator authenticator;
 
