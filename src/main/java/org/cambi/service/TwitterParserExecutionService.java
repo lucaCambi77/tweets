@@ -3,13 +3,13 @@ package org.cambi.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cambi.dto.TweetDto;
+import org.cambi.exception.TwitterParserRunnableException;
 import org.springframework.stereotype.Service;
 
+import javax.management.RuntimeErrorException;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 @Service
 @AllArgsConstructor
@@ -20,23 +20,28 @@ public class TwitterParserExecutionService {
     private final long maxPollTime = 30;
     private ExecutorService executor;
 
-    public Set<TweetDto> getTweetsFromExecution(String path) {
+    public Set<TweetDto> getTweetsFromExecution(String path) throws Exception {
         log.debug("I am looking for tweets...");
 
         runnable.setPath(path);
         Future<?> future = executor.submit(runnable);
 
+        Exception exception = null;
+
         try {
             future.get(maxPollTime, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
-        } catch (RuntimeException e) {
-            future.cancel(true);
-            throw new RuntimeException(e);
+        } catch (TwitterParserRunnableException | InterruptedException | ExecutionException e) {
+            exception = e;
         } finally {
             executor.shutdownNow();
-            return runnable.getTweets();
         }
+
+        if (Objects.nonNull(exception))
+            throw exception;
+
+        return runnable.getTweets();
     }
 
 }

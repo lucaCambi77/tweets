@@ -21,15 +21,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doThrow;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
-public class ParseTweetsTest {
+public class TwitterParseTweetsTest {
 
     @InjectMocks
     private TwitterParserService twitterParserService;
@@ -56,7 +54,7 @@ public class ParseTweetsTest {
     }
 
     @Test
-    public void shouldMatchRunDto() throws ExecutionException, InterruptedException, TimeoutException {
+    public void shouldMatchRunDto() throws Exception {
         Mockito.lenient().when(twitterParserRunnableService.getTweetsFromExecution("query"))
                 .thenAnswer((Answer<Set<TweetDto>>) invocation -> new HashSet<>(Arrays.asList(
                         TweetDto.builder()
@@ -77,11 +75,10 @@ public class ParseTweetsTest {
 
         Mockito.verify(twitterParserRunnableService
                 , Mockito.times(1)).getTweetsFromExecution("query");
-
     }
 
     @Test
-    public void shouldCatchRunTimeException() {
+    public void shouldCatchRunTimeException() throws Exception {
 
         doThrow(new RuntimeException("RunTimeException")).when(twitterParserRunnableService).getTweetsFromExecution("query");
         RunDto run = twitterParserService.parseTweetsFrom("query");

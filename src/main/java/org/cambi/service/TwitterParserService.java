@@ -23,7 +23,7 @@ public class TwitterParserService {
         try {
             Set<TweetDto> tweetDtos = twitterParserExecutionService.getTweetsFromExecution(path);
             run.setTweets(tweetDtos);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             run.setException(e.getMessage());
         }
 

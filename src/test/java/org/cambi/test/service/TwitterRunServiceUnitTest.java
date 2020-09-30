@@ -37,7 +37,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(JUnitPlatform.class)
 @ExtendWith(MockitoExtension.class)
-public class RunServiceUnitTest extends Constant {
+public class TwitterRunServiceUnitTest extends Constant {
 
     @InjectMocks
     private RunService runService;
@@ -96,7 +96,6 @@ public class RunServiceUnitTest extends Constant {
         Mockito.lenient().when(runDao.save(any())).thenReturn(new Run());
         Mockito.lenient().when(twitterDao.save(any())).thenReturn(new TweetRun());
         Mockito.lenient().when(userDao.save(any())).thenReturn(new UserTweet());
-
     }
 
     @Test

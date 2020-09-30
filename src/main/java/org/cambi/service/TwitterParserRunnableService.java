@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.GenericUrl;
 import lombok.extern.slf4j.Slf4j;
 import org.cambi.dto.TweetDto;
+import org.cambi.exception.TwitterParserRunnableException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,7 +67,7 @@ public class TwitterParserRunnableService implements Runnable {
 
         } catch (Exception e) {
 
-            throw new RuntimeException((e));
+            throw new TwitterParserRunnableException((e));
         }
 
     }
