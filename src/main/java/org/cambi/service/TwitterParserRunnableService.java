@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.cambi.dto.TweetDto;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -17,11 +16,6 @@ import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author luca
- *
- */
-@Service
 @Slf4j
 public class TwitterParserRunnableService implements Runnable {
 

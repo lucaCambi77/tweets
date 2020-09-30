@@ -3,38 +3,30 @@ package org.cambi.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.cambi.dto.RunDto;
+import org.cambi.dto.TweetDto;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.*;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class TwitterParserService {
 
-    private TwitterParserRunnableService runnable;
+    private TwitterParserExecutionService twitterParserExecutionService;
 
-    public RunDto parseTweetsFrom(String path)
-            throws InterruptedException, ExecutionException {
-        log.info("I am looking for tweets...");
-
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        runnable.setPath(path);
-        Future<?> future = executor.submit(runnable);
+    public RunDto parseTweetsFrom(String path) {
+        log.debug("I am looking for tweets...");
 
         RunDto run = new RunDto();
+
         try {
-            future.get(30, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            future.cancel(true);
+            Set<TweetDto> tweetDtos = twitterParserExecutionService.getTweetsFromExecution(path);
+            run.setTweets(tweetDtos);
         } catch (RuntimeException e) {
-            future.cancel(true);
             run.setException(e.getMessage());
-        } finally {
-            run.setTweets(runnable.getTweets());
         }
 
-        executor.shutdownNow();
         return run;
     }
 

@@ -10,11 +10,10 @@ import org.cambi.dto.UserTweetDto;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
-import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
 import org.cambi.service.RunService;
-import org.cambi.service.TwitterParserService;
 import org.cambi.service.TwitterParserRunnableService;
+import org.cambi.service.TwitterParserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +25,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
@@ -102,7 +100,7 @@ public class RunServiceUnitTest extends Constant {
     }
 
     @Test
-    public void should_parse_tweets_while_creating_run() throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
+    public void should_parse_tweets_while_creating_run() throws InterruptedException, ExecutionException {
 
         runService.createRun(DEFAULT_API, search);
 

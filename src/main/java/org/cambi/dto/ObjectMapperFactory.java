@@ -30,14 +30,10 @@ public class ObjectMapperFactory extends Constant {
     public ObjectMapperFactory() {
         this.objectMapper = new ObjectMapper();
 
-        /**
-         * Object mapper serialization properties
-         */
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        // objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
         DateFormat dateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
         objectMapper.setDateFormat(dateFormat);
