@@ -85,16 +85,16 @@ public class TwitterDaoUnitTest extends Constant {
 
         List<Run> runs = runDao.findAll();
         assertEquals(1, runs.size());
-        assertEquals(run.getRunId(), runs.get(0).getRunId());
+        assertEquals(run, runs.get(0));
 
         List<TweetRun> tweets = twitterDao.findAll();
         assertEquals(1, tweets.size());
-        assertEquals(this.tweets.getMessageId(), tweets.get(0).getMessageId());
+        assertEquals(this.tweets, tweets.get(0));
 
         List<UserTweet> users = userDao.findAll();
         assertEquals(1, users.size());
-        assertEquals(this.userTweets.getId().getUserId(), users.get(0).getId().getUserId());
-        assertEquals(this.userTweets.getId().getMessageId(), users.get(0).getId().getMessageId());
+        assertEquals(userTweets, users.get(0));
+
     }
 
     @Test
@@ -102,7 +102,6 @@ public class TwitterDaoUnitTest extends Constant {
 
         List<UserTweet> users = userDao.findByRun(run.getRunId(), Sort.by(Sort.Order.asc("column")));
         assertEquals(1, users.size());
-        assertEquals(userTweets.getId().getUserId(), users.get(0).getId().getUserId());
-        assertEquals(userTweets.getId().getMessageId(), users.get(0).getId().getMessageId());
+        assertEquals(userTweets, users.get(0));
     }
 }
