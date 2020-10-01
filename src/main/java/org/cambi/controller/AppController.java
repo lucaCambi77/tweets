@@ -5,7 +5,7 @@ import org.cambi.model.Run;
 import org.cambi.model.UserTweet;
 import org.cambi.oauth.twitter.TwitterAuthenticationException;
 import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.RunService;
+import org.cambi.service.TweeterRunService;
 import org.cambi.service.UserTweetsService;
 import org.cambi.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class AppController extends Constant {
     private TwitterAuthenticator authenticator;
 
     @Autowired
-    private RunService runService;
+    private TweeterRunService tweeterRunService;
 
     @Autowired
     private UserTweetsService userTweetsService;
@@ -36,7 +36,7 @@ public class AppController extends Constant {
                    @RequestParam(name = "query", required = false, defaultValue = "?track=bieber") String query)
             throws IOException, TwitterAuthenticationException, InterruptedException, ExecutionException {
 
-        return runService.createRun(api, query);
+        return tweeterRunService.createRun(api, query);
     }
 
     @GetMapping("/userTweets")
@@ -49,7 +49,7 @@ public class AppController extends Constant {
 
     @GetMapping("/run/list")
     public List<Run> runList() {
-        return runService.findAllRun();
+        return tweeterRunService.findAllRun();
     }
 
     @GetMapping("/")

@@ -10,8 +10,7 @@ import org.cambi.dto.UserTweetDto;
 import org.cambi.model.Run;
 import org.cambi.model.TweetRun;
 import org.cambi.model.UserTweet;
-import org.cambi.oauth.twitter.TwitterAuthenticator;
-import org.cambi.service.RunService;
+import org.cambi.service.TweeterRunService;
 import org.cambi.service.TwitterParserRunnableService;
 import org.cambi.service.TwitterParserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,10 +39,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 public class TwitterRunServiceUnitTest extends Constant {
 
     @InjectMocks
-    private RunService runService;
-
-    @Mock
-    private TwitterAuthenticator authenticator;
+    private TweeterRunService tweeterRunService;
 
     @Mock
     private TweetDao twitterDao;
@@ -63,7 +59,7 @@ public class TwitterRunServiceUnitTest extends Constant {
     private static String search = "?track=bieber";
 
     @BeforeEach
-    public void setUp() throws ExecutionException, InterruptedException {
+    public void setUp() {
 
         Mockito.lenient().when(twitterParserRunnableService.getTweets())
                 .thenAnswer((Answer<Set<TweetDto>>) invocation -> new HashSet<>(
@@ -101,7 +97,7 @@ public class TwitterRunServiceUnitTest extends Constant {
     @Test
     public void should_parse_tweets_while_creating_run() throws InterruptedException, ExecutionException {
 
-        runService.createRun(DEFAULT_API, search);
+        tweeterRunService.createRun(DEFAULT_API, search);
 
         Mockito.verify(twitterParserService
                 , Mockito.times(1)).parseTweetsFrom(DEFAULT_API.concat(search));
@@ -110,9 +106,7 @@ public class TwitterRunServiceUnitTest extends Constant {
     @Test
     public void should_create_run() throws ExecutionException, InterruptedException {
 
-        runService.createRun(DEFAULT_API, search);
-
-        Mockito.verify(runDao, Mockito.times(1)).save(any());
+        tweeterRunService.createRun(DEFAULT_API, search);
 
         Mockito.verify(runDao, Mockito.times(1)).save(any());
 

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile({ "production" })
-public class AppConfiguration extends Constant {
+public class AppAuthenticatorConfiguration extends Constant {
 
 	@Bean
 	public TwitterAuthenticator getTwitterAuthenticator() {
