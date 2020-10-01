@@ -3,7 +3,7 @@ package org.cambi.application;
 import org.cambi.controller.AppController;
 import org.cambi.dao.UserTweetDao;
 import org.cambi.model.Run;
-import org.cambi.service.TweeterRunService;
+import org.cambi.service.TwitterRunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,7 +23,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories(basePackageClasses = UserTweetDao.class)
 @EnableTransactionManagement
-@ComponentScan(basePackageClasses = {TweeterRunService.class, AppController.class})
+@ComponentScan(basePackageClasses = {TwitterRunService.class, AppController.class})
 public class AppDaoConfig {
 
     @Autowired

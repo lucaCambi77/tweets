@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TweeterRunService extends Constant {
+public class TwitterRunService extends Constant {
 
     private TwitterParserService twitterParserService;
     private TweetDao tweetDao;
