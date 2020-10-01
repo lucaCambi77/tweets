@@ -10,7 +10,6 @@ import com.google.api.client.testing.http.MockLowLevelHttpRequest;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import org.cambi.dto.TweetDto;
 
-import java.io.IOException;
 import java.util.Set;
 
 public class Utils {
@@ -24,7 +23,7 @@ public class Utils {
             public LowLevelHttpRequest buildRequest(String method, String url) {
                 return new MockLowLevelHttpRequest() {
                     @Override
-                    public LowLevelHttpResponse execute() throws IOException {
+                    public LowLevelHttpResponse execute() {
 
                         try {
 

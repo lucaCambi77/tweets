@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @AllArgsConstructor
@@ -40,7 +39,7 @@ public class TwitterRunService extends Constant {
     }
 
     @Transactional
-    public Run createRun(String api, String query) throws ExecutionException, InterruptedException {
+    public Run createRun(String api, String query) {
         Date start = new Date();
 
         RunDto response = twitterParserService.parseTweetsFrom(api.concat(query));

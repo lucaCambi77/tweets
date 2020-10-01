@@ -6,7 +6,6 @@ import org.cambi.dto.TweetDto;
 import org.cambi.exception.TwitterParserRunnableException;
 import org.springframework.stereotype.Service;
 
-import javax.management.RuntimeErrorException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.*;
