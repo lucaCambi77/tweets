@@ -44,7 +44,7 @@ public class TwitterIntegrationTest extends Constant {
 
     @Test
     @Transactional
-    public void should_create_run_from_tweet_request() throws IOException, ExecutionException, InterruptedException {
+    public void should_create_run() throws IOException, ExecutionException, InterruptedException {
 
         Run run = twitterRunService.createRun(DEFAULT_API, "query");
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -62,7 +62,10 @@ public class TwitterIntegrationTest extends Constant {
         log.info("We have a new Run");
 
         assertEquals(1, twitterRunService.findAllRun().size());
-        assertEquals(5, userTweetsService.findUserTweetsByRun(twitterRunService.findAllRun().get(0).getRunId()).size());
+        Run persistedRun = twitterRunService.findAllRun().get(0);
+        assertEquals(run, persistedRun);
+
+        assertEquals(5, userTweetsService.findUserTweetsByRun(persistedRun.getRunId()).size());
     }
 
     @Test
@@ -75,8 +78,5 @@ public class TwitterIntegrationTest extends Constant {
         assertEquals(1, aRun.get(0).getRunId());
         assertEquals("?track=trump", aRun.get(0).getApiQuery());
         assertEquals(1, aRun.get(0).getUserTweets().size());
-
-        log.info(objectMapper.writeValueAsString(aRun.get(0)));
     }
-
 }

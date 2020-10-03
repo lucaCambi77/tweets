@@ -92,9 +92,7 @@ public class TwitterRunService extends Constant {
                 userDao.save(
                         user.toBuilder()
                                 .id(new UserTweetId(listByUser.getKey().getId(), tweetPost)).build());
-
             }
         }
     }
-
 }
